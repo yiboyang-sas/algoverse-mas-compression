@@ -2,3 +2,6 @@ __pycache__/
 *.pyc
 results.json
 .DS_Store
+.venv/
+.venv/
+__pycache__/
