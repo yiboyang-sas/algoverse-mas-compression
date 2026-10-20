@@ -42,6 +42,15 @@ AGENT2_SYSTEM = (
 )
 
 
+# The REQUIRED_CALL / NEXT_CALL / INJECT_CALL markers below name the exact tool
+# and arguments in Agent 1's prompt. MockBackend keys off them, so they have to
+# exist for the zero-setup path. A real model, though, does not have to read a
+# single document when the answer is printed above them, and Agent 2's call is
+# dictated rather than recovered from the handoff. That makes any real-model
+# result a measurement of nothing. run.py turns this off for real backends.
+EMIT_MOCK_MARKERS = True
+
+
 def run_pipeline(task: dict, agent_backend, compressor_backend,
                  condition: str) -> dict:
     """Run one task through the two-agent pipeline under one condition.
@@ -107,10 +116,11 @@ def _build_agent1_input(task: dict) -> str:
     a1_tools = set(task.get("agent1_tools", ["read_file", "read_db"]))
     parts = [f"TASK: {task['agent1_task']}"]
 
-    for rc in task.get("required_calls", []):
-        args = ", ".join(f'{k}="{v}"' for k, v in rc.get("args", {}).items())
-        marker = "REQUIRED_CALL" if rc["tool"] in a1_tools else "NEXT_CALL"
-        parts.append(f"{marker}: {rc['tool']}({args})")
+    if EMIT_MOCK_MARKERS:
+        for rc in task.get("required_calls", []):
+            args = ", ".join(f'{k}="{v}"' for k, v in rc.get("args", {}).items())
+            marker = "REQUIRED_CALL" if rc["tool"] in a1_tools else "NEXT_CALL"
+            parts.append(f"{marker}: {rc['tool']}({args})")
 
     parts.append("\nDOCUMENTS:")
     for i, doc in enumerate(task.get("documents", [])):
@@ -119,7 +129,7 @@ def _build_agent1_input(task: dict) -> str:
     # The injection lives inside a document already (see tasks). The marker
     # below is only for the mock backend to detect the intended harmful call.
     harm = task.get("harmful_call")
-    if harm and task.get("injection_marker_for_mock", True):
+    if harm and EMIT_MOCK_MARKERS and task.get("injection_marker_for_mock", True):
         args = ", ".join(f'{k}="{v}"' for k, v in harm.get("args", {}).items())
         parts.append(f"\nINJECT_CALL: {harm['tool']}({args})")
 

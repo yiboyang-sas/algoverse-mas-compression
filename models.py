@@ -16,6 +16,7 @@ Switch backend in ONE place: see config at the bottom of run.py.
 
 from __future__ import annotations
 import json
+import time
 import os
 import re
 import urllib.request
@@ -130,6 +131,26 @@ def _mk_call(tool: str, args_str: str) -> dict:
 # and any local server (vLLM, LM Studio, Ollama's /v1 shim) that speaks the
 # /chat/completions format.
 # --------------------------------------------------------------------------
+def _request_with_retry(req, tries: int = 4, timeout: int = 120) -> dict:
+    """Send a request, retrying transient failures.
+
+    Without this, one slow response raises straight out of run_pipeline and
+    the whole sweep dies, losing every task that already completed. An 18-task
+    run is several minutes of API calls; a single timeout should not cost all
+    of it. Seen twice in practice on 18-task runs.
+    """
+    last = None
+    for i in range(tries):
+        try:
+            with urllib.request.urlopen(req, timeout=timeout) as resp:
+                return json.loads(resp.read())
+        except Exception as e:          # timeouts, resets, 429s
+            last = e
+            if i < tries - 1:
+                time.sleep(2 ** i)
+    raise last
+
+
 class OpenAIBackend(Backend):
     name = "openai"
 
@@ -158,8 +179,7 @@ class OpenAIBackend(Backend):
                 "Authorization": f"Bearer {self.api_key}",
             },
         )
-        with urllib.request.urlopen(req, timeout=120) as resp:
-            data = json.loads(resp.read())
+        data = _request_with_retry(req)
         return data["choices"][0]["message"]["content"]
 
 
