@@ -2,3 +2,9 @@ __pycache__/
 *.pyc
 results.json
 .DS_Store
+.venv/
+.venv/
+__pycache__/
+baseline.py
+baseline_results.json
+ws_7_walkthrough.txt
