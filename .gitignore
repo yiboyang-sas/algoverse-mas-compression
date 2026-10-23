@@ -9,3 +9,8 @@ baseline.py
 baseline_results.json
 ws_7_walkthrough.txt
 *.partial.jsonl
+.cache/
+.pytest_cache/
+.env
+.env.*
+experiments/

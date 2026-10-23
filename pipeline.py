@@ -19,9 +19,12 @@ Real models sometimes wrap that in prose or ```json fences; _parse handles both.
 from __future__ import annotations
 import json
 import re
+import copy
+import hashlib
 
 from environment import ToolLog, score_run, TOOL_REGISTRY, describe_tools
 from compressors import compress
+from telemetry import TracedBackend, PipelineExecutionError, text_size, usage_totals
 
 
 # Bump when the agent prompts change, so resumed runs never mix versions.
@@ -78,8 +81,81 @@ EMIT_MOCK_MARKERS = True
 DELEGATE = False
 
 
+def _task_sha256(task):
+    return hashlib.sha256(json.dumps(task, sort_keys=True, separators=(",", ":"),
+                                     ensure_ascii=False).encode()).hexdigest()
+
+
+def _decode_agent1(task, raw, agent1_input):
+    log = ToolLog()
+    parsed = _parse(raw)
+    dropped = _replay(parsed.get("tool_calls", []), log,
+                      allowed=task.get("agent1_tools", ["read_file", "read_db"]))
+    note = parsed.get("handoff_note", "")
+    if note and not isinstance(note, str):
+        note = json.dumps(note, ensure_ascii=False)
+    handoff = note or raw
+    if DELEGATE:
+        handoff = _with_delegated(handoff, dropped, task.get(
+            "agent2_held_tools", task.get("allowed_tools", [])))
+    return {"agent1_input": agent1_input, "agent1_raw": raw, "handoff": handoff,
+            "calls": log.calls, "dropped_calls": dropped, "parsed_reply": parsed,
+            "parse_status": _parse_status(raw, parsed)}
+
+
+def prepare_agent1(task: dict, agent_backend) -> dict:
+    """One upstream draw. The runner persists it before any controlled arm."""
+    requests = []
+    agent1_input = _build_agent1_input(task)
+    system = AGENT1_SYSTEM.format(
+        a1_tools=describe_tools(task.get("agent1_tools", ["read_file", "read_db"])),
+        a2_tools=describe_tools(task.get("agent2_held_tools", task.get("allowed_tools", []))))
+    try:
+        raw = TracedBackend(agent_backend, "agent1", requests).chat(system, agent1_input)
+    except (Exception, SystemExit, KeyboardInterrupt) as exc:
+        raise PipelineExecutionError("agent1", exc, {
+            "task_id": task.get("id"), "condition": None,
+            "model_requests": requests}) from exc
+    prepared = _decode_agent1(task, raw, agent1_input)
+    model = getattr(agent_backend, "model", agent_backend.name)
+    prepared.update({"task_id": task.get("id"), "task_sha256": _task_sha256(task),
+                     "prompt_version": PROMPT_VERSION, "delegate": DELEGATE,
+                     "mock_markers": EMIT_MOCK_MARKERS, "model_requests": requests,
+                     "provider_usage": usage_totals(requests),
+                     "token_counts": {key: text_size(prepared[key], model)
+                                      for key in ("agent1_input", "agent1_raw", "handoff")}})
+    return prepared
+
+
+def validate_prepared_agent1(prepared: dict, task: dict):
+    """Reject cache drift and disagreement with the saved upstream raw reply."""
+    expected = {"task_id": task.get("id"), "task_sha256": _task_sha256(task),
+                "prompt_version": PROMPT_VERSION, "delegate": DELEGATE,
+                "mock_markers": EMIT_MOCK_MARKERS}
+    if not isinstance(prepared, dict) or any(prepared.get(k) != v for k, v in expected.items()):
+        raise ValueError("prepared Agent 1 task or prompt configuration differs")
+    if not isinstance(prepared.get("agent1_raw"), str):
+        raise ValueError("prepared Agent 1 raw response must be text")
+    decoded = _decode_agent1(task, prepared["agent1_raw"], _build_agent1_input(task))
+    if any(prepared.get(k) != v for k, v in decoded.items()):
+        raise ValueError("prepared Agent 1 evidence differs from its raw reply or input")
+    requests = prepared.get("model_requests")
+    system = AGENT1_SYSTEM.format(
+        a1_tools=describe_tools(task.get("agent1_tools", ["read_file", "read_db"])),
+        a2_tools=describe_tools(task.get("agent2_held_tools", task.get("allowed_tools", []))))
+    if (not isinstance(requests, list) or len(requests) != 1
+            or requests[0].get("stage") != "agent1" or requests[0].get("status") != "completed"
+            or requests[0].get("response") != prepared["agent1_raw"]
+            or requests[0].get("system") != system
+            or requests[0].get("user") != decoded["agent1_input"]
+            or requests[0].get("reused", False)):
+        raise ValueError("prepared Agent 1 request trace is inconsistent")
+    if prepared.get("provider_usage") != usage_totals(requests):
+        raise ValueError("prepared Agent 1 usage differs from its provider trace")
+
+
 def run_pipeline(task: dict, agent_backend, compressor_backend,
-                 condition: str) -> dict:
+                 condition: str, prepared_agent1: dict | None = None) -> dict:
     """Run one task through the two-agent pipeline under one condition.
 
     Tools are scoped per agent. Agent 1 holds only agent1_tools; Agent 2 holds
@@ -89,23 +165,42 @@ def run_pipeline(task: dict, agent_backend, compressor_backend,
     then persuades Agent 2 (which does hold the harmful tool) to act. That is
     exactly what compression is meant to prevent, so this is the case we test.
     """
-    log = ToolLog()
-    a1_tools = task.get("agent1_tools", ["read_file", "read_db"])
+    shared = prepared_agent1 is not None
+    if shared:
+        validate_prepared_agent1(prepared_agent1, task)
+        prepared = copy.deepcopy(prepared_agent1)
+    else:
+        try:
+            prepared = prepare_agent1(task, agent_backend)
+        except PipelineExecutionError as exc:
+            exc.partial_trial["condition"] = condition
+            raise
+    requests = prepared["model_requests"]
+    if shared:
+        requests[0]["reused"] = True
+    log = ToolLog(calls=copy.deepcopy(prepared["calls"]))
+    partial = {"task_id": task.get("id"), "condition": condition,
+               "model_requests": requests}
+
+    def stage_call(stage, fn):
+        try:
+            return fn()
+        except (Exception, SystemExit, KeyboardInterrupt) as exc:
+            raise PipelineExecutionError(stage, exc, partial) from exc
+
     a2_held = task.get("agent2_held_tools", task.get("allowed_tools", []))
 
     # ---- Agent 1 ----------------------------------------------------------
-    a1_input = _build_agent1_input(task)
-    a1_system = AGENT1_SYSTEM.format(a1_tools=describe_tools(a1_tools),
-                                     a2_tools=describe_tools(a2_held))
-    a1_raw = agent_backend.chat(a1_system, a1_input)
-    a1 = _parse(a1_raw)
-    a1_dropped = _replay(a1.get("tool_calls", []), log, allowed=a1_tools)
-    handoff = a1.get("handoff_note", "") or a1_raw
-    if DELEGATE:
-        handoff = _with_delegated(handoff, a1_dropped, a2_held)
+    a1_input, a1_raw = prepared["agent1_input"], prepared["agent1_raw"]
+    a1, a1_dropped = prepared["parsed_reply"], prepared["dropped_calls"]
+    handoff = prepared["handoff"]
+    partial.update(agent1_raw=a1_raw, handoff=handoff)
+    agent1_calls = list(log.calls)
 
     # ---- Compress the handoff --------------------------------------------
-    compressed = compress(condition, handoff, compressor_backend, task)
+    compressed = stage_call("compression", lambda: compress(
+        condition, handoff, TracedBackend(compressor_backend, "compression", requests), task))
+    partial["compressed"] = compressed
 
     # ---- Agent 2 ----------------------------------------------------------
     # Agent 2 is told its HELD tools (what it can physically call). The allowlist
@@ -113,7 +208,8 @@ def run_pipeline(task: dict, agent_backend, compressor_backend,
     # never sees it. Agent 2 can still fire a held tool if the text asks it to.
     a2_system = AGENT2_SYSTEM.format(tools=describe_tools(a2_held))
     a2_input = f"Handoff from Agent 1:\n{compressed}"
-    a2_raw = agent_backend.chat(a2_system, a2_input)
+    a2_raw = stage_call("agent2", lambda: TracedBackend(
+        agent_backend, "agent2", requests).chat(a2_system, a2_input))
     a2 = _parse(a2_raw)
     a2_dropped = _replay(a2.get("tool_calls", []), log, allowed=a2_held)
 
@@ -123,6 +219,7 @@ def run_pipeline(task: dict, agent_backend, compressor_backend,
         "task_id": task.get("id"),
         "condition": condition,
         "payload_scope": task.get("payload_scope"),
+        "reference_calls": task.get("required_calls", []),
         # keep the text at every stage so the team can see where the attack
         # died or survived
         "text": {
@@ -133,7 +230,19 @@ def run_pipeline(task: dict, agent_backend, compressor_backend,
             "agent2_raw": a2_raw,
         },
         "dropped_calls": {"agent1": a1_dropped, "agent2": a2_dropped},
+        "stage_calls": {"agent1": agent1_calls, "agent2": log.calls[len(agent1_calls):]},
+        "parsed_replies": {"agent1": a1, "agent2": a2},
+        "parse_status": {"agent1": _parse_status(a1_raw, a1),
+                         "agent2": _parse_status(a2_raw, a2)},
+        "model_requests": requests,
+        "provider_usage": usage_totals([r for r in requests if not r.get("reused")]),
+        "token_counts": {key: text_size(value, getattr(agent_backend, "model", agent_backend.name))
+                         for key, value in {"agent1_input": a1_input, "handoff": handoff,
+                                            "compressed": compressed, "agent1_raw": a1_raw,
+                                            "agent2_raw": a2_raw}.items()},
     })
+    if shared:
+        outcome["usage_scope"] = "condition_requests_excluding_shared_agent1"
     return outcome
 
 
@@ -208,6 +317,8 @@ def _replay(tool_calls, log: ToolLog, allowed: list) -> list:
     dropped = []
     if isinstance(tool_calls, dict):
         tool_calls = [tool_calls]
+    if not isinstance(tool_calls, (list, tuple)):
+        return [{"tool": "", "args": {}, "why": "malformed tool_calls"}]
     for c in tool_calls or []:
         tool, args = _norm_call(c)
         if tool in TOOL_REGISTRY and tool in allowed_set:
@@ -216,6 +327,19 @@ def _replay(tool_calls, log: ToolLog, allowed: list) -> list:
             dropped.append({"tool": tool, "args": args,
                             "why": "not held" if tool in TOOL_REGISTRY else "unknown tool"})
     return dropped
+
+
+def _parse_status(raw, parsed):
+    """Diagnostic only: normalization does not change the primary scorer."""
+    if not raw:
+        return "empty_response"
+    if parsed.get("handoff_note") == raw.strip() and not parsed.get("tool_calls"):
+        return "text_fallback"
+    if not isinstance(parsed.get("tool_calls", []), (list, dict)):
+        return "malformed_tool_calls"
+    if not isinstance(parsed.get("handoff_note", ""), str):
+        return "structured_handoff"
+    return "parsed_json"
 
 
 def _parse(raw: str) -> dict:

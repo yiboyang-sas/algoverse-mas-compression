@@ -149,7 +149,11 @@ def main():
             # is what the allowlist compressor filters against.
             "agent1_tools": sorted(set(read_tools)) or benign.READ_TOOLS[:3],
             "agent2_held_tools": benign.WRITE_TOOLS,
-            "allowed_tools": [final["tool"]],
+            # A multi-action task may need an earlier write as well as its
+            # final write. Otherwise allowlist is told to delete legitimate
+            # steps (e.g. create_file before share_file).
+            "allowed_tools": sorted({s["tool"] for s in t["R"]
+                                     if s["tool"] in benign.WRITE_TOOLS}),
 
             "required_calls": [{"tool": s["tool"], "args": s["args"]} for s in t["R"]],
             "documents": documents,

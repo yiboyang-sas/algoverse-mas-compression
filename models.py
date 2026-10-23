@@ -22,6 +22,8 @@ import re
 import urllib.request
 import urllib.error
 
+from budget import BudgetError, prompt_token_bound
+
 
 class Backend:
     """A backend just needs chat(system, user) -> str."""
@@ -150,7 +152,9 @@ def _retry_after(err, detail: str):
     return min(secs + 1, 90)
 
 
-def _request_with_retry(req, tries: int = 8, timeout: int = 120) -> dict:
+def _request_with_retry(req, tries: int = 8, timeout: int = 120,
+                        audit: list | None = None,
+                        before_attempt=None, finish_attempt=None) -> dict:
     """Send a request, retrying transient failures.
 
     Without this, one slow response raises straight out of run_pipeline and
@@ -160,10 +164,28 @@ def _request_with_retry(req, tries: int = 8, timeout: int = 120) -> dict:
     """
     last = None
     for i in range(tries):
+        attempt = {"attempt": i + 1}
+        if audit is not None:
+            audit.append(attempt)
+        reservation = None
+        if before_attempt is not None:
+            try:
+                reservation = before_attempt()
+                attempt["budget_reservation_id"] = reservation
+            except BudgetError:
+                attempt["status"] = "budget_blocked"
+                raise
         try:
             with urllib.request.urlopen(req, timeout=timeout) as resp:
-                return json.loads(resp.read())
+                data = json.loads(resp.read())
+                attempt.update(status="completed", http_status=getattr(resp, "status", 200))
+                if finish_attempt is not None:
+                    attempt["budget"] = finish_attempt(reservation, data.get("usage"), "completed")
+                return data
         except urllib.error.HTTPError as e:
+            attempt.update(status="http_error", http_status=e.code)
+            if finish_attempt is not None:
+                attempt["budget"] = finish_attempt(reservation, None, "http_error")
             # 429 and 5xx are usually transient; 400/401/404 will fail the
             # same way every time, so surface them immediately. OpenAI also
             # returns 429 for an account with no credits (insufficient_quota),
@@ -191,7 +213,13 @@ def _request_with_retry(req, tries: int = 8, timeout: int = 120) -> dict:
                 print(f"    rate limited, waiting {wait:.0f}s", flush=True)
                 time.sleep(wait)
                 continue
+        except BudgetError:
+            # Budget denials or ledger failures must never become retries.
+            raise
         except Exception as e:          # timeouts, connection resets
+            attempt.update(status="transport_error", error_type=type(e).__name__)
+            if finish_attempt is not None:
+                attempt["budget"] = finish_attempt(reservation, None, "transport_error")
             last = e
         if i < tries - 1:
             time.sleep(2 ** i)
@@ -208,16 +236,25 @@ class OpenAIBackend(Backend):
         self.api_key = api_key or os.environ.get("OPENAI_API_KEY", "")
         self.base_url = base_url.rstrip("/")
         self.temperature = temperature
+        self.last_response_metadata = {}
+        self.budget = None
+        self.max_output_tokens = None
 
     def chat(self, system: str, user: str) -> str:
-        body = json.dumps({
+        self.last_response_metadata = {"http_attempts": []}
+        payload = {
             "model": self.model,
             "temperature": self.temperature,
             "messages": [
                 {"role": "system", "content": system},
                 {"role": "user", "content": user},
             ],
-        }).encode()
+        }
+        if self.max_output_tokens is not None:
+            payload["max_completion_tokens"] = self.max_output_tokens
+        if self.budget is not None and self.max_output_tokens is None:
+            raise BudgetError("budgeted requests require an explicit max_output_tokens")
+        body = json.dumps(payload).encode()
         req = urllib.request.Request(
             f"{self.base_url}/chat/completions",
             data=body,
@@ -226,8 +263,39 @@ class OpenAIBackend(Backend):
                 "Authorization": f"Bearer {self.api_key}",
             },
         )
-        data = _request_with_retry(req)
-        return data["choices"][0]["message"]["content"]
+        try:
+            hooks = {}
+            if self.budget is not None:
+                bound = prompt_token_bound(payload["messages"])
+                hooks = {
+                    "before_attempt": lambda: self.budget.before_request(bound, self.max_output_tokens),
+                    "finish_attempt": lambda reservation, usage, status: self.budget.finalize(
+                        reservation, usage=usage, status=status),
+                }
+            data = _request_with_retry(req, audit=self.last_response_metadata["http_attempts"], **hooks)
+        except (Exception, SystemExit) as exc:
+            # Persist useful categories without copying HTTP response bodies or
+            # credentials into experiment error logs.
+            message = str(exc).lower()
+            self.last_response_metadata["error_category"] = (
+                "budget" if isinstance(exc, BudgetError) else
+                "insufficient_quota" if "insufficient_quota" in message else
+                "authentication" if "401" in message else
+                "rate_limit" if "limit" in message or "429" in message else
+                "api_or_transport_error")
+            raise
+        self.last_response_metadata.update({
+            "response_id": data.get("id"),
+            "response_model": data.get("model"),
+            "system_fingerprint": data.get("system_fingerprint"),
+            "usage": data.get("usage"),
+            "finish_reason": data["choices"][0].get("finish_reason"),
+            "refusal": data["choices"][0]["message"].get("refusal"),
+        })
+        # Refusals and filtered completions are observed model behavior. Keep
+        # them in the task denominator rather than retrying as network errors.
+        content = data["choices"][0]["message"].get("content")
+        return "" if content is None else content
 
 
 # --------------------------------------------------------------------------

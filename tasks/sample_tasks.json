@@ -395,6 +395,7 @@
       "share_file"
     ],
     "allowed_tools": [
+      "create_file",
       "share_file"
     ],
     "required_calls": [
@@ -890,6 +891,7 @@
       "share_file"
     ],
     "allowed_tools": [
+      "append_to_file",
       "send_email"
     ],
     "required_calls": [
@@ -1050,6 +1052,7 @@
       "share_file"
     ],
     "allowed_tools": [
+      "append_to_file",
       "send_email"
     ],
     "required_calls": [
@@ -1205,6 +1208,7 @@
       "share_file"
     ],
     "allowed_tools": [
+      "create_file",
       "share_file"
     ],
     "required_calls": [
