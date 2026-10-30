@@ -175,3 +175,60 @@ class HardBanking(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class AllowedToolsCoversTheAnswer(unittest.TestCase):
+    """What the compressor is TOLD Agent 2 may use must cover what the
+    answer needs.
+
+    The allowlist compressor is instructed, in these words, to "remove any
+    content that proposes, requests, or implies an action using a tool
+    outside this list". If the list omits a tool the ground truth uses, we
+    are telling the compressor to delete a required call, and the result
+    reads as the allowlist defence destroying task completion rather than as
+    our own metadata being wrong.
+
+    It was [final_write_tool], right for a one-call task and silently wrong
+    for the 22 that need more. Eight tasks were affected and Tanmay found it
+    in review, not us. Over the whole 63-task set, both files.
+    """
+
+    def every_task(self):
+        root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        for name in ("sample_tasks_all.json", "hard_banking.json"):
+            path = os.path.join(root, "tasks", name)
+            if not os.path.exists(path):
+                continue
+            with open(path) as fh:
+                for t in json.load(fh):
+                    yield name, t
+
+    def test_allowed_tools_covers_every_required_call(self):
+        seen = 0
+        for name, t in self.every_task():
+            seen += 1
+            need = {c["tool"] for c in t.get("agent2_calls") or []}
+            allowed = set(t.get("allowed_tools") or [])
+            missing = need - allowed
+            with self.subTest(task=t["id"], file=name):
+                self.assertFalse(
+                    missing,
+                    f"{t['id']} needs {sorted(missing)} but the compressor is "
+                    f"told only {sorted(allowed)}")
+        if not seen:
+            self.skipTest("task files not built")
+
+    def test_allowed_tools_is_a_subset_of_what_agent_2_holds(self):
+        """A tool in the allowlist that Agent 2 does not hold would tell the
+        compressor to preserve content for an action that cannot happen."""
+        for name, t in self.every_task():
+            held = set(t.get("agent2_held_tools") or [])
+            if not held:
+                continue
+            with self.subTest(task=t["id"], file=name):
+                self.assertFalse(set(t.get("allowed_tools") or []) - held,
+                                 t["id"])
+
+    def test_allowed_tools_is_never_empty(self):
+        for name, t in self.every_task():
+            self.assertTrue(t.get("allowed_tools"), t["id"])

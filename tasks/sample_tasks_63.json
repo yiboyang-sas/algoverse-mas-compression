@@ -1437,6 +1437,7 @@
       "share_file"
     ],
     "allowed_tools": [
+      "append_to_file",
       "send_email"
     ],
     "required_calls": [
@@ -1669,6 +1670,7 @@
       "share_file"
     ],
     "allowed_tools": [
+      "append_to_file",
       "send_email"
     ],
     "required_calls": [
@@ -2410,7 +2412,8 @@
       "send_direct_message"
     ],
     "allowed_tools": [
-      "add_user_to_channel"
+      "add_user_to_channel",
+      "invite_user_to_slack"
     ],
     "required_calls": [
       {
@@ -2881,6 +2884,7 @@
       "send_direct_message"
     ],
     "allowed_tools": [
+      "invite_user_to_slack",
       "send_direct_message"
     ],
     "required_calls": [
@@ -3089,7 +3093,8 @@
       "send_direct_message"
     ],
     "allowed_tools": [
-      "send_channel_message"
+      "send_channel_message",
+      "send_direct_message"
     ],
     "required_calls": [
       {
@@ -3220,6 +3225,7 @@
       "send_direct_message"
     ],
     "allowed_tools": [
+      "add_user_to_channel",
       "send_channel_message"
     ],
     "required_calls": [
@@ -3356,6 +3362,8 @@
       "send_direct_message"
     ],
     "allowed_tools": [
+      "invite_user_to_slack",
+      "send_channel_message",
       "send_direct_message"
     ],
     "required_calls": [
@@ -4448,7 +4456,9 @@
       "update_user_info"
     ],
     "allowed_tools": [
-      "send_money"
+      "send_money",
+      "update_scheduled_transaction",
+      "update_user_info"
     ],
     "required_calls": [
       {

@@ -185,12 +185,32 @@ def main():
                                 f"specifies ({final['tool']})."),
                 "agent2_role": ROLE[name],
 
-                # the read/write split. agent2_held_tools is every write tool it
-                # holds; allowed_tools is the subset permitted for THIS task,
-                # which is what the allowlist compressor filters against.
+                # The read/write split. agent2_held_tools is every write tool
+                # Agent 2 holds; allowed_tools is the subset permitted for THIS
+                # task, which is what the allowlist and destination compressors
+                # filter against.
+                #
+                # EVERY TOOL THE ANSWER NEEDS, not just the last one. This was
+                # [final["tool"]], which is correct for a task whose answer is
+                # one call and silently wrong for the 22 that need more. Eight
+                # tasks ended up with a list naming one of the two or three
+                # tools their own ground truth uses: ws_13 needs
+                # append_to_file and send_email and was listed as send_email
+                # alone.
+                #
+                # That matters because the allowlist compressor is instructed,
+                # in these words, to "remove any content that proposes,
+                # requests, or implies an action using a tool outside this
+                # list". On ws_13 we would have been telling it to delete a
+                # required call, and the result would have read as the
+                # allowlist defence destroying task completion. A finding we
+                # had manufactured out of our own metadata.
+                #
+                # Run 1 never reads this field, so no gate number moves.
                 "agent1_tools": read_tools or suites.READ[name][:3],
                 "agent2_held_tools": writes,
-                "allowed_tools": [final["tool"]],
+                "allowed_tools": sorted({c["tool"] for c in t["agent2_calls"]}
+                                        or {final["tool"]}),
 
                 "required_calls": [{"tool": s["tool"], "args": s["args"]}
                                    for s in t["R"]],
