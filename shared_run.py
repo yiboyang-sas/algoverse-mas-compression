@@ -43,7 +43,7 @@ from models import MockBackend, OpenAIBackend
 
 ROOT = Path(__file__).resolve().parent
 TASKS_FILE = "tasks/sample_tasks_63.json"
-DATASET_SHA256 = "cc9aed2091594034d68c7205225b810179139f1993cde9a11df4f241f22b51a9"
+DATASET_SHA256 = "eb78f48f100b05c3277bb748a5a8e78e81981bfe00532063e570ee4d99090eed"
 DESIGN = "shared-handoff-primary"
 CONDITIONS = tuple(compressors.ALL_CONDITIONS)
 SOURCE_FILES = (

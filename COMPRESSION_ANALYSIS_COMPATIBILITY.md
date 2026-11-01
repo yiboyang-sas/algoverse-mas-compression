@@ -17,7 +17,7 @@ The comparison is against PR [4](https://github.com/yiboyang-sas/algoverse-mas-c
 | Failure interpretation | Existing PLAN/schema warning | Exclusive observable profiles for malformed/empty replies, missing actions, downstream schema/access problems and saved argument misses |
 | Statistics | PR #4 task-cluster bootstrap mathematics | Validate identical upstream draws, report all 15 pairwise contrasts, discordance and per-task patterns; five none-reference contrasts marked primary |
 
-The canonical dataset SHA256 is `cc9aed2091594034d68c7205225b810179139f1993cde9a11df4f241f22b51a9`. It is not the old 18-task benchmark, the 51-task file, or `baseline.py`'s legacy 14-task default. `ws_32` and `ws_37` are absent from the 63-task dataset because their sequential file-ID dependency is incompatible with this one-turn setup; this contribution does not reintroduce them.
+The canonical dataset SHA256 is `eb78f48f100b05c3277bb748a5a8e78e81981bfe00532063e570ee4d99090eed`. It is not the old 18-task benchmark, the 51-task file, or `baseline.py`'s legacy 14-task default. `ws_32` and `ws_37` are absent from the 63-task dataset because their sequential file-ID dependency is incompatible with this one-turn setup; this contribution does not reintroduce them.
 
 The nominal budget preserves upstream semantics: prompted compressors request approximately 111 words, while `sliding_window` retains 600 characters. It is not a hard 150-token output ceiling. Report realized lengths and ratios using native metrics; do not reinterpret long outputs as a different configuration. The upstream prompts, compression implementations, control planting and benchmark/scoring functions are unchanged.
 
