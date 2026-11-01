@@ -839,12 +839,15 @@ class _PerThreadSystem:
         return prompt
 
 
-def run_with_schema(task, agent_backend, compressor_backend, condition):
+def run_with_schema(task, agent_backend, compressor_backend, condition, prepared_agent1=None):
     held = task.get("agent2_held_tools") or task.get("allowed_tools") or []
     _a2.prompt = _AGENT2_TEMPLATE.replace("{sigs}", _signatures(held))
     pipeline.AGENT2_SYSTEM = _PerThreadSystem()
     try:
-        return _orig_run(task, agent_backend, compressor_backend, condition)
+        if prepared_agent1 is None:
+            return _orig_run(task, agent_backend, compressor_backend, condition)
+        return _orig_run(task, agent_backend, compressor_backend, condition,
+                         prepared_agent1=prepared_agent1)
     finally:
         _a2.prompt = None
 
@@ -1372,8 +1375,10 @@ _orig_rp = pipeline.run_pipeline
 
 
 def _run_instrumented(task, agent_backend, compressor_backend, condition,
-                      repeat: int = 0):
-    cfg = RUN
+                      repeat: int = 0, prepared_agent1=None,
+                      run_config=None, trace_writer=None):
+    cfg = run_config if run_config is not None else RUN
+    writer = trace_writer if trace_writer is not None else TRACE
     ctx = instrument.TaskRunContext(
         run_id=cfg.run_id if cfg else "adhoc",
         task_id=task.get("id", "?"),
@@ -1383,14 +1388,18 @@ def _run_instrumented(task, agent_backend, compressor_backend, condition,
         condition=condition,
         model=(cfg.model if cfg else None),
         temperature=(cfg.temperature if cfg else None),
-        trace=TRACE,
+        trace=writer,
     )
     instrument.traced(agent_backend)
     if compressor_backend is not agent_backend:
         instrument.traced(compressor_backend)
 
     with instrument.run_context(ctx):
-        r = _orig_rp(task, agent_backend, compressor_backend, condition)
+        if prepared_agent1 is None:
+            r = _orig_rp(task, agent_backend, compressor_backend, condition)
+        else:
+            r = _orig_rp(task, agent_backend, compressor_backend, condition,
+                         prepared_agent1=prepared_agent1)
 
     m = _measure(task, r, condition, ctx, cfg)
     r["metrics"] = m.as_dict()
@@ -1418,8 +1427,8 @@ def _run_instrumented(task, agent_backend, compressor_backend, condition,
         ((r.get("text") or {}).get("compressed")
          if condition != "none" else None))]
 
-    if TRACE is not None:
-        TRACE.write("runs", tracing.run_record(
+    if writer is not None:
+        writer.write("runs", tracing.run_record(
             cfg=cfg or runconfig.RunConfig(), task=task, repeat=repeat,
             metrics=m, scoring={
                 "task_success": r.get("task_success"),
@@ -1434,7 +1443,16 @@ def _run_instrumented(task, agent_backend, compressor_backend, condition,
             calls=r.get("calls") or [],
             extra={"parse_events": list(ctx.parse_events),
                    "retries": ctx.retries,
-                   "n_model_calls": len(ctx.calls)},
+                   "n_model_calls": len(ctx.calls),
+                   **({"design": "shared-handoff-primary",
+                       "experiment_id": prepared_agent1["experiment_id"],
+                       "shared_handoff_id": prepared_agent1["shared_handoff_id"],
+                       "agent1_output_sha256": prepared_agent1["agent1_output_sha256"],
+                       "handoff_sha256": prepared_agent1["handoff_sha256"],
+                       "controls": r["controls"], "tool_mismatch": r["tool_mismatch"],
+                       "agent1_reused": True,
+                       "agent1_trace_dir": "../../shared_agent1"}
+                      if prepared_agent1 is not None and "shared_handoff_id" in prepared_agent1 else {})},
         ))
     return r
 

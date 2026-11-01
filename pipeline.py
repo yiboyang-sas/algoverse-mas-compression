@@ -51,8 +51,26 @@ AGENT2_SYSTEM = (
 EMIT_MOCK_MARKERS = True
 
 
+def prepare_agent1(task: dict, agent_backend) -> dict:
+    """Run the native Agent 1 stage once for a persisted shared-handoff draw.
+
+    The caller supplies the existing instrument.run_context/TraceWriter. No
+    backend wrapper or alternate parser/scorer is introduced here.
+    """
+    agent1_input = _build_agent1_input(task)
+    raw = agent_backend.chat(AGENT1_SYSTEM, agent1_input)
+    parsed = _parse(raw)
+    reads = ToolLog()
+    _replay(parsed.get("tool_calls", []), reads,
+            allowed=task.get("agent1_tools", ["read_file", "read_db"]))
+    return {"task_id": task.get("id"), "agent1_input": agent1_input,
+            "agent1_system": AGENT1_SYSTEM, "agent1_raw": raw,
+            "parsed_agent1": parsed, "read_calls": reads.calls,
+            "handoff": parsed.get("handoff_note", "") or raw}
+
+
 def run_pipeline(task: dict, agent_backend, compressor_backend,
-                 condition: str) -> dict:
+                 condition: str, prepared_agent1: dict | None = None) -> dict:
     """Run one task through the two-agent pipeline under one condition.
 
     Tools are scoped per agent. Agent 1 holds only agent1_tools; Agent 2 holds
@@ -68,10 +86,24 @@ def run_pipeline(task: dict, agent_backend, compressor_backend,
 
     # ---- Agent 1 ----------------------------------------------------------
     a1_input = _build_agent1_input(task)
-    a1_raw = agent_backend.chat(AGENT1_SYSTEM, a1_input)
+    if prepared_agent1 is None:
+        a1_raw = agent_backend.chat(AGENT1_SYSTEM, a1_input)
+    else:
+        if (prepared_agent1.get("task_id") != task.get("id")
+                or prepared_agent1.get("agent1_input") != a1_input
+                or prepared_agent1.get("agent1_system") != AGENT1_SYSTEM):
+            raise ValueError("prepared Agent 1 task/input/prompt mismatch")
+        a1_raw = prepared_agent1["agent1_raw"]
+    # Cached raw is parsed/replayed through the native functions in each arm,
+    # retaining the existing two parser events without another Agent 1 call.
     a1 = _parse(a1_raw)
     _replay(a1.get("tool_calls", []), log, allowed=a1_tools)
     handoff = a1.get("handoff_note", "") or a1_raw
+    if prepared_agent1 is not None and (
+            prepared_agent1.get("parsed_agent1") != a1
+            or prepared_agent1.get("read_calls") != log.calls
+            or prepared_agent1.get("handoff") != handoff):
+        raise ValueError("prepared Agent 1 evidence differs from its native raw parsing")
 
     # ---- Compress the handoff --------------------------------------------
     compressed = compress(condition, handoff, compressor_backend, task)
