@@ -1,0 +1,10 @@
+{
+  "api_or_pipeline_failures": 1134,
+  "backend": "openai",
+  "experiment_id": "run2-primary",
+  "manifest_sha256": "aa4030a831da2c5120f7a32b4a95c9b70bfbf38d5f32b368113a23edd999e36a",
+  "scientific_model_results": true,
+  "shared_handoffs": 189,
+  "status": "complete_with_errors",
+  "terminal_trials": 1134
+}

@@ -1,0 +1,254 @@
+{
+  "experiment_id": "run2-primary",
+  "backend": "openai",
+  "settings": {
+    "model": "gpt-4o-mini",
+    "temperature": 0.0,
+    "compressor_budget_tokens": 150,
+    "repeats": 3
+  },
+  "tasks": 63,
+  "clean_slots": 0,
+  "conditions": {
+    "none": {
+      "planned": 189,
+      "scored": 0,
+      "errors": 189,
+      "success": null,
+      "call_completion": null,
+      "required_calls": 0,
+      "mismatch_calls": 0,
+      "mismatch_calls_recovered": 0,
+      "call_completion_ex_mismatch": null,
+      "clean_scored": 0,
+      "success_clean": null,
+      "mismatch_tasks": [],
+      "mismatch_fields": [],
+      "controls": {
+        "C": {
+          "planted": 0,
+          "in_handoff": null,
+          "in_compressed": null,
+          "handoff_slots": 0,
+          "survived_compression": null
+        },
+        "N1": {
+          "planted": 0,
+          "in_handoff": null,
+          "in_compressed": null,
+          "handoff_slots": 0,
+          "survived_compression": null
+        },
+        "N2": {
+          "planted": 0,
+          "in_handoff": null,
+          "in_compressed": null,
+          "handoff_slots": 0,
+          "survived_compression": null
+        }
+      },
+      "handoff_tokens_median": null,
+      "compressed_tokens_median": null
+    },
+    "sliding_window": {
+      "planned": 189,
+      "scored": 0,
+      "errors": 189,
+      "success": null,
+      "call_completion": null,
+      "required_calls": 0,
+      "mismatch_calls": 0,
+      "mismatch_calls_recovered": 0,
+      "call_completion_ex_mismatch": null,
+      "clean_scored": 0,
+      "success_clean": null,
+      "mismatch_tasks": [],
+      "mismatch_fields": [],
+      "controls": {
+        "C": {
+          "planted": 0,
+          "in_handoff": null,
+          "in_compressed": null,
+          "handoff_slots": 0,
+          "survived_compression": null
+        },
+        "N1": {
+          "planted": 0,
+          "in_handoff": null,
+          "in_compressed": null,
+          "handoff_slots": 0,
+          "survived_compression": null
+        },
+        "N2": {
+          "planted": 0,
+          "in_handoff": null,
+          "in_compressed": null,
+          "handoff_slots": 0,
+          "survived_compression": null
+        }
+      },
+      "handoff_tokens_median": null,
+      "compressed_tokens_median": null
+    },
+    "unconditional": {
+      "planned": 189,
+      "scored": 0,
+      "errors": 189,
+      "success": null,
+      "call_completion": null,
+      "required_calls": 0,
+      "mismatch_calls": 0,
+      "mismatch_calls_recovered": 0,
+      "call_completion_ex_mismatch": null,
+      "clean_scored": 0,
+      "success_clean": null,
+      "mismatch_tasks": [],
+      "mismatch_fields": [],
+      "controls": {
+        "C": {
+          "planted": 0,
+          "in_handoff": null,
+          "in_compressed": null,
+          "handoff_slots": 0,
+          "survived_compression": null
+        },
+        "N1": {
+          "planted": 0,
+          "in_handoff": null,
+          "in_compressed": null,
+          "handoff_slots": 0,
+          "survived_compression": null
+        },
+        "N2": {
+          "planted": 0,
+          "in_handoff": null,
+          "in_compressed": null,
+          "handoff_slots": 0,
+          "survived_compression": null
+        }
+      },
+      "handoff_tokens_median": null,
+      "compressed_tokens_median": null
+    },
+    "destination": {
+      "planned": 189,
+      "scored": 0,
+      "errors": 189,
+      "success": null,
+      "call_completion": null,
+      "required_calls": 0,
+      "mismatch_calls": 0,
+      "mismatch_calls_recovered": 0,
+      "call_completion_ex_mismatch": null,
+      "clean_scored": 0,
+      "success_clean": null,
+      "mismatch_tasks": [],
+      "mismatch_fields": [],
+      "controls": {
+        "C": {
+          "planted": 0,
+          "in_handoff": null,
+          "in_compressed": null,
+          "handoff_slots": 0,
+          "survived_compression": null
+        },
+        "N1": {
+          "planted": 0,
+          "in_handoff": null,
+          "in_compressed": null,
+          "handoff_slots": 0,
+          "survived_compression": null
+        },
+        "N2": {
+          "planted": 0,
+          "in_handoff": null,
+          "in_compressed": null,
+          "handoff_slots": 0,
+          "survived_compression": null
+        }
+      },
+      "handoff_tokens_median": null,
+      "compressed_tokens_median": null
+    },
+    "instruction_strip": {
+      "planned": 189,
+      "scored": 0,
+      "errors": 189,
+      "success": null,
+      "call_completion": null,
+      "required_calls": 0,
+      "mismatch_calls": 0,
+      "mismatch_calls_recovered": 0,
+      "call_completion_ex_mismatch": null,
+      "clean_scored": 0,
+      "success_clean": null,
+      "mismatch_tasks": [],
+      "mismatch_fields": [],
+      "controls": {
+        "C": {
+          "planted": 0,
+          "in_handoff": null,
+          "in_compressed": null,
+          "handoff_slots": 0,
+          "survived_compression": null
+        },
+        "N1": {
+          "planted": 0,
+          "in_handoff": null,
+          "in_compressed": null,
+          "handoff_slots": 0,
+          "survived_compression": null
+        },
+        "N2": {
+          "planted": 0,
+          "in_handoff": null,
+          "in_compressed": null,
+          "handoff_slots": 0,
+          "survived_compression": null
+        }
+      },
+      "handoff_tokens_median": null,
+      "compressed_tokens_median": null
+    },
+    "allowlist": {
+      "planned": 189,
+      "scored": 0,
+      "errors": 189,
+      "success": null,
+      "call_completion": null,
+      "required_calls": 0,
+      "mismatch_calls": 0,
+      "mismatch_calls_recovered": 0,
+      "call_completion_ex_mismatch": null,
+      "clean_scored": 0,
+      "success_clean": null,
+      "mismatch_tasks": [],
+      "mismatch_fields": [],
+      "controls": {
+        "C": {
+          "planted": 0,
+          "in_handoff": null,
+          "in_compressed": null,
+          "handoff_slots": 0,
+          "survived_compression": null
+        },
+        "N1": {
+          "planted": 0,
+          "in_handoff": null,
+          "in_compressed": null,
+          "handoff_slots": 0,
+          "survived_compression": null
+        },
+        "N2": {
+          "planted": 0,
+          "in_handoff": null,
+          "in_compressed": null,
+          "handoff_slots": 0,
+          "survived_compression": null
+        }
+      },
+      "handoff_tokens_median": null,
+      "compressed_tokens_median": null
+    }
+  }
+}

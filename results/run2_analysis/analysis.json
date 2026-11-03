@@ -1,0 +1,2175 @@
+{
+  "analysis_version": "shared-handoff-primary-analysis-v2",
+  "design": "shared-handoff-primary",
+  "data_kind": "backend_unverified_from_upstream_metadata",
+  "shared_upstream": {
+    "root": "/Users/yiboyang/Desktop/algoverse-mas-compression/results/run2/run2_primary",
+    "manifest_sha256": "640001782e8960b5d1afc97a3f82d7b642e53532740c4fb24797c01b629dfb85",
+    "handoffs_sha256": "aaf13043b319828db0b084c912fbffe587302efd560e3eb6a19f5e0775820db0",
+    "upstream_calls_sha256": "fe62a86b590dd45638c35390c76f6dd10cf0aa992221e8be455c5ad7cbb52e74",
+    "cached_draws": 189,
+    "ready_draws": 0,
+    "expected_draws": 189,
+    "local_text_token_counts_counted_once": {
+      "prompt_tokens": 878814,
+      "output_tokens": 0
+    },
+    "missing_local_usage_counts": {},
+    "manifest": {
+      "agent1_trace_dir": "shared_agent1",
+      "arms": {
+        "allowlist": {
+          "run_dir": "arms/allowlist",
+          "run_id": "run2-primary-allowlist"
+        },
+        "destination": {
+          "run_dir": "arms/destination",
+          "run_id": "run2-primary-destination"
+        },
+        "instruction_strip": {
+          "run_dir": "arms/instruction_strip",
+          "run_id": "run2-primary-instruction_strip"
+        },
+        "none": {
+          "run_dir": "arms/none",
+          "run_id": "run2-primary-none"
+        },
+        "sliding_window": {
+          "run_dir": "arms/sliding_window",
+          "run_id": "run2-primary-sliding_window"
+        },
+        "unconditional": {
+          "run_dir": "arms/unconditional",
+          "run_id": "run2-primary-unconditional"
+        }
+      },
+      "backend": "openai",
+      "cache_atomicity_limit": "A call intent without a durable terminal cache requires manual review; it is never redrawn automatically.",
+      "conditions": [
+        "none",
+        "sliding_window",
+        "unconditional",
+        "destination",
+        "instruction_strip",
+        "allowlist"
+      ],
+      "created_at": "2026-11-03T14:21:40Z",
+      "design": "shared-handoff-primary",
+      "experiment_id": "run2-primary",
+      "experimental_design": "One immutable Agent 1 draw per task/repeat reused across all six arms; none completed first.",
+      "full_primary": true,
+      "handoffs_file": "handoffs.jsonl",
+      "manifest_sha256": "aa4030a831da2c5120f7a32b4a95c9b70bfbf38d5f32b368113a23edd999e36a",
+      "planned": {
+        "arm_trials": 1134,
+        "handoffs": 189,
+        "model_calls_without_transport_retries": 2079
+      },
+      "schema_version": 1,
+      "settings": {
+        "attack_enabled": false,
+        "backend": "openai",
+        "compressor_budget_tokens": 150,
+        "compressor_model": "gpt-4o-mini",
+        "controls_enabled": true,
+        "dataset_sha256": "eb78f48f100b05c3277bb748a5a8e78e81981bfe00532063e570ee4d99090eed",
+        "dataset_task_ids": [
+          "ws_6",
+          "ws_7",
+          "ws_8",
+          "ws_9",
+          "ws_12",
+          "ws_21",
+          "ws_29",
+          "ws_31",
+          "ws_15",
+          "ws_18",
+          "ws_34",
+          "ws_20",
+          "ws_33",
+          "ws_25",
+          "ws_13",
+          "ws_4",
+          "ws_19",
+          "ws_36",
+          "sl_1",
+          "sl_2",
+          "sl_3",
+          "sl_4",
+          "sl_6",
+          "sl_8",
+          "sl_11",
+          "sl_13",
+          "sl_14",
+          "sl_15",
+          "sl_16",
+          "sl_17",
+          "sl_18",
+          "sl_19",
+          "sl_20",
+          "bk_0",
+          "bk_2",
+          "bk_3",
+          "bk_4",
+          "bk_5",
+          "bk_6",
+          "bk_9",
+          "bk_11",
+          "bk_12",
+          "bk_13",
+          "bk_14",
+          "bk_15",
+          "tr_0",
+          "tr_1",
+          "tr_3",
+          "tr_4",
+          "tr_7",
+          "tr_8",
+          "bk_h1",
+          "bk_h2",
+          "bk_h3",
+          "bk_h4",
+          "bk_h5",
+          "bk_h6",
+          "bk_h7",
+          "bk_h8",
+          "bk_h9",
+          "bk_h10",
+          "bk_h11",
+          "bk_h12"
+        ],
+        "handoff_regime": "plan",
+        "model": "gpt-4o-mini",
+        "prompt_hashes": {
+          "agent1": "0dd82941f7cb",
+          "agent2_template": "a5c75b9200b6"
+        },
+        "repeats": 3,
+        "seed": null,
+        "seed_policy": "unset_native_default_not_bit_reproducible",
+        "synthetic_expansion": true,
+        "task_ids": [
+          "ws_6",
+          "ws_7",
+          "ws_8",
+          "ws_9",
+          "ws_12",
+          "ws_21",
+          "ws_29",
+          "ws_31",
+          "ws_15",
+          "ws_18",
+          "ws_34",
+          "ws_20",
+          "ws_33",
+          "ws_25",
+          "ws_13",
+          "ws_4",
+          "ws_19",
+          "ws_36",
+          "sl_1",
+          "sl_2",
+          "sl_3",
+          "sl_4",
+          "sl_6",
+          "sl_8",
+          "sl_11",
+          "sl_13",
+          "sl_14",
+          "sl_15",
+          "sl_16",
+          "sl_17",
+          "sl_18",
+          "sl_19",
+          "sl_20",
+          "bk_0",
+          "bk_2",
+          "bk_3",
+          "bk_4",
+          "bk_5",
+          "bk_6",
+          "bk_9",
+          "bk_11",
+          "bk_12",
+          "bk_13",
+          "bk_14",
+          "bk_15",
+          "tr_0",
+          "tr_1",
+          "tr_3",
+          "tr_4",
+          "tr_7",
+          "tr_8",
+          "bk_h1",
+          "bk_h2",
+          "bk_h3",
+          "bk_h4",
+          "bk_h5",
+          "bk_h6",
+          "bk_h7",
+          "bk_h8",
+          "bk_h9",
+          "bk_h10",
+          "bk_h11",
+          "bk_h12"
+        ],
+        "tasks_file": "tasks/sample_tasks_63.json",
+        "temperature": 0.0,
+        "token_count_method": "tiktoken:o200k_base",
+        "workers": 4
+      },
+      "source": {
+        "files": {
+          "agent1_prompts.py": "354585f1bd96fd747c51f2426fee24fba6361d60f15ccb8662e518190e159e30",
+          "baseline.py": "4e5314ed06b4f048456e61a73afcfbc252a526b671570c705d6ba9d0f0a2b16b",
+          "compressors.py": "eeaa6e8b5bb0e7a11753248419b67ca091b356edb6190ade9a2caca1779b3b71",
+          "config.py": "26957d89dd09ef0f34b3fa882feb6d5057a3d06e775d2c0d34ee7f9b19fc3808",
+          "controls.py": "4fe3255cd1f58dcaf480c25de9e3db2afd18d749fa117f753e10e4e444614274",
+          "environment.py": "629646a992465d98faebe1b4d3f9926c4a24a8eec8636d771924e2bd7edddaa3",
+          "failure_stage.py": "fe5d62741314663b0fb8f992b50d0416b95d1e381e552022e76860831de6505e",
+          "instrument.py": "7484be276763b1578c1259f8f6d5ce7369a419d165e794696427e6350fd5119f",
+          "metrics.py": "abb528f460a9b91ff77df612465fe0baa4485a98cd3e64abe8d17abd3a346d18",
+          "models.py": "11f9f06e12eb5cd06bd624e8758dc624078300e80e6b59f50cb7c9fa384de01b",
+          "obtainable.py": "986cb905da69c2efde618d0c60b8bac7cba402a016ccab793f45d0255451bb55",
+          "pipeline.py": "3afc4c0b86f4a172e9ede8898d849fe8ecd3788e2429183de77079097fac8cb8",
+          "shared_run.py": "0a9847e20c92e61a8d41e5546334d50fdd83e2bb9ec7bc781062ba4ff2062240",
+          "suite_tools.py": "6106e98b47772a0ef0765e6082e9dea6d37e6e141c543231b3c50f9d0e526cd4",
+          "tracing.py": "617239124af662205fffea69e07186e7868948e7f5304408361de955f4e07f05"
+        },
+        "git_branch": "compression-redesign",
+        "git_commit": "80725de345d0be47b3a671814c343a6198e7d65f",
+        "git_dirty": true
+      }
+    }
+  },
+  "conditions": [
+    {
+      "condition": "none",
+      "run_id": "run2-primary-none",
+      "selected_tasks": 63,
+      "expected_trials": 189,
+      "observed_trials": 189,
+      "scored_trials": 0,
+      "missing_trials": 0,
+      "api_or_pipeline_failures": 189,
+      "orphan_call_groups": 0,
+      "scored_trials_with_incomplete_stage_traces": 0,
+      "task_success": {
+        "estimate": null,
+        "low": null,
+        "high": null,
+        "n_tasks": 0,
+        "n_observations": 0
+      },
+      "observed_task_success_rate": null,
+      "macro_task_call_completion": {
+        "estimate": null,
+        "low": null,
+        "high": null,
+        "n_tasks": 0,
+        "n_observations": 0
+      },
+      "required_call_hit_rate": null,
+      "required_hits": 0,
+      "required_calls": 0,
+      "repeat_task_success": {
+        "0": null,
+        "1": null,
+        "2": null
+      },
+      "group_task_success": {
+        "suite": {
+          "banking": {
+            "estimate": null,
+            "low": null,
+            "high": null,
+            "n_tasks": 0,
+            "n_observations": 0
+          },
+          "slack": {
+            "estimate": null,
+            "low": null,
+            "high": null,
+            "n_tasks": 0,
+            "n_observations": 0
+          },
+          "travel": {
+            "estimate": null,
+            "low": null,
+            "high": null,
+            "n_tasks": 0,
+            "n_observations": 0
+          },
+          "workspace": {
+            "estimate": null,
+            "low": null,
+            "high": null,
+            "n_tasks": 0,
+            "n_observations": 0
+          }
+        },
+        "compression_stratum": {
+          "unknown": {
+            "estimate": null,
+            "low": null,
+            "high": null,
+            "n_tasks": 0,
+            "n_observations": 0
+          }
+        }
+      },
+      "failure_taxonomy_counts": {
+        "pipeline_or_transport_error": 189
+      },
+      "compressed_length_observations": 0,
+      "compressed_tokens_median": null,
+      "over_nominal_budget": 0,
+      "cer_median": null,
+      "local_text_token_counts": {
+        "prompt_tokens": 0,
+        "output_tokens": 0
+      },
+      "missing_local_usage_counts": {},
+      "token_count_method": "tiktoken:o200k_base",
+      "usage_is_billed_provider_usage": false
+    },
+    {
+      "condition": "sliding_window",
+      "run_id": "run2-primary-sliding_window",
+      "selected_tasks": 63,
+      "expected_trials": 189,
+      "observed_trials": 189,
+      "scored_trials": 0,
+      "missing_trials": 0,
+      "api_or_pipeline_failures": 189,
+      "orphan_call_groups": 0,
+      "scored_trials_with_incomplete_stage_traces": 0,
+      "task_success": {
+        "estimate": null,
+        "low": null,
+        "high": null,
+        "n_tasks": 0,
+        "n_observations": 0
+      },
+      "observed_task_success_rate": null,
+      "macro_task_call_completion": {
+        "estimate": null,
+        "low": null,
+        "high": null,
+        "n_tasks": 0,
+        "n_observations": 0
+      },
+      "required_call_hit_rate": null,
+      "required_hits": 0,
+      "required_calls": 0,
+      "repeat_task_success": {
+        "0": null,
+        "1": null,
+        "2": null
+      },
+      "group_task_success": {
+        "suite": {
+          "banking": {
+            "estimate": null,
+            "low": null,
+            "high": null,
+            "n_tasks": 0,
+            "n_observations": 0
+          },
+          "slack": {
+            "estimate": null,
+            "low": null,
+            "high": null,
+            "n_tasks": 0,
+            "n_observations": 0
+          },
+          "travel": {
+            "estimate": null,
+            "low": null,
+            "high": null,
+            "n_tasks": 0,
+            "n_observations": 0
+          },
+          "workspace": {
+            "estimate": null,
+            "low": null,
+            "high": null,
+            "n_tasks": 0,
+            "n_observations": 0
+          }
+        },
+        "compression_stratum": {
+          "unknown": {
+            "estimate": null,
+            "low": null,
+            "high": null,
+            "n_tasks": 0,
+            "n_observations": 0
+          }
+        }
+      },
+      "failure_taxonomy_counts": {
+        "pipeline_or_transport_error": 189
+      },
+      "compressed_length_observations": 0,
+      "compressed_tokens_median": null,
+      "over_nominal_budget": 0,
+      "cer_median": null,
+      "local_text_token_counts": {
+        "prompt_tokens": 0,
+        "output_tokens": 0
+      },
+      "missing_local_usage_counts": {},
+      "token_count_method": "tiktoken:o200k_base",
+      "usage_is_billed_provider_usage": false
+    },
+    {
+      "condition": "unconditional",
+      "run_id": "run2-primary-unconditional",
+      "selected_tasks": 63,
+      "expected_trials": 189,
+      "observed_trials": 189,
+      "scored_trials": 0,
+      "missing_trials": 0,
+      "api_or_pipeline_failures": 189,
+      "orphan_call_groups": 0,
+      "scored_trials_with_incomplete_stage_traces": 0,
+      "task_success": {
+        "estimate": null,
+        "low": null,
+        "high": null,
+        "n_tasks": 0,
+        "n_observations": 0
+      },
+      "observed_task_success_rate": null,
+      "macro_task_call_completion": {
+        "estimate": null,
+        "low": null,
+        "high": null,
+        "n_tasks": 0,
+        "n_observations": 0
+      },
+      "required_call_hit_rate": null,
+      "required_hits": 0,
+      "required_calls": 0,
+      "repeat_task_success": {
+        "0": null,
+        "1": null,
+        "2": null
+      },
+      "group_task_success": {
+        "suite": {
+          "banking": {
+            "estimate": null,
+            "low": null,
+            "high": null,
+            "n_tasks": 0,
+            "n_observations": 0
+          },
+          "slack": {
+            "estimate": null,
+            "low": null,
+            "high": null,
+            "n_tasks": 0,
+            "n_observations": 0
+          },
+          "travel": {
+            "estimate": null,
+            "low": null,
+            "high": null,
+            "n_tasks": 0,
+            "n_observations": 0
+          },
+          "workspace": {
+            "estimate": null,
+            "low": null,
+            "high": null,
+            "n_tasks": 0,
+            "n_observations": 0
+          }
+        },
+        "compression_stratum": {
+          "unknown": {
+            "estimate": null,
+            "low": null,
+            "high": null,
+            "n_tasks": 0,
+            "n_observations": 0
+          }
+        }
+      },
+      "failure_taxonomy_counts": {
+        "pipeline_or_transport_error": 189
+      },
+      "compressed_length_observations": 0,
+      "compressed_tokens_median": null,
+      "over_nominal_budget": 0,
+      "cer_median": null,
+      "local_text_token_counts": {
+        "prompt_tokens": 0,
+        "output_tokens": 0
+      },
+      "missing_local_usage_counts": {},
+      "token_count_method": "tiktoken:o200k_base",
+      "usage_is_billed_provider_usage": false
+    },
+    {
+      "condition": "destination",
+      "run_id": "run2-primary-destination",
+      "selected_tasks": 63,
+      "expected_trials": 189,
+      "observed_trials": 189,
+      "scored_trials": 0,
+      "missing_trials": 0,
+      "api_or_pipeline_failures": 189,
+      "orphan_call_groups": 0,
+      "scored_trials_with_incomplete_stage_traces": 0,
+      "task_success": {
+        "estimate": null,
+        "low": null,
+        "high": null,
+        "n_tasks": 0,
+        "n_observations": 0
+      },
+      "observed_task_success_rate": null,
+      "macro_task_call_completion": {
+        "estimate": null,
+        "low": null,
+        "high": null,
+        "n_tasks": 0,
+        "n_observations": 0
+      },
+      "required_call_hit_rate": null,
+      "required_hits": 0,
+      "required_calls": 0,
+      "repeat_task_success": {
+        "0": null,
+        "1": null,
+        "2": null
+      },
+      "group_task_success": {
+        "suite": {
+          "banking": {
+            "estimate": null,
+            "low": null,
+            "high": null,
+            "n_tasks": 0,
+            "n_observations": 0
+          },
+          "slack": {
+            "estimate": null,
+            "low": null,
+            "high": null,
+            "n_tasks": 0,
+            "n_observations": 0
+          },
+          "travel": {
+            "estimate": null,
+            "low": null,
+            "high": null,
+            "n_tasks": 0,
+            "n_observations": 0
+          },
+          "workspace": {
+            "estimate": null,
+            "low": null,
+            "high": null,
+            "n_tasks": 0,
+            "n_observations": 0
+          }
+        },
+        "compression_stratum": {
+          "unknown": {
+            "estimate": null,
+            "low": null,
+            "high": null,
+            "n_tasks": 0,
+            "n_observations": 0
+          }
+        }
+      },
+      "failure_taxonomy_counts": {
+        "pipeline_or_transport_error": 189
+      },
+      "compressed_length_observations": 0,
+      "compressed_tokens_median": null,
+      "over_nominal_budget": 0,
+      "cer_median": null,
+      "local_text_token_counts": {
+        "prompt_tokens": 0,
+        "output_tokens": 0
+      },
+      "missing_local_usage_counts": {},
+      "token_count_method": "tiktoken:o200k_base",
+      "usage_is_billed_provider_usage": false
+    },
+    {
+      "condition": "instruction_strip",
+      "run_id": "run2-primary-instruction_strip",
+      "selected_tasks": 63,
+      "expected_trials": 189,
+      "observed_trials": 189,
+      "scored_trials": 0,
+      "missing_trials": 0,
+      "api_or_pipeline_failures": 189,
+      "orphan_call_groups": 0,
+      "scored_trials_with_incomplete_stage_traces": 0,
+      "task_success": {
+        "estimate": null,
+        "low": null,
+        "high": null,
+        "n_tasks": 0,
+        "n_observations": 0
+      },
+      "observed_task_success_rate": null,
+      "macro_task_call_completion": {
+        "estimate": null,
+        "low": null,
+        "high": null,
+        "n_tasks": 0,
+        "n_observations": 0
+      },
+      "required_call_hit_rate": null,
+      "required_hits": 0,
+      "required_calls": 0,
+      "repeat_task_success": {
+        "0": null,
+        "1": null,
+        "2": null
+      },
+      "group_task_success": {
+        "suite": {
+          "banking": {
+            "estimate": null,
+            "low": null,
+            "high": null,
+            "n_tasks": 0,
+            "n_observations": 0
+          },
+          "slack": {
+            "estimate": null,
+            "low": null,
+            "high": null,
+            "n_tasks": 0,
+            "n_observations": 0
+          },
+          "travel": {
+            "estimate": null,
+            "low": null,
+            "high": null,
+            "n_tasks": 0,
+            "n_observations": 0
+          },
+          "workspace": {
+            "estimate": null,
+            "low": null,
+            "high": null,
+            "n_tasks": 0,
+            "n_observations": 0
+          }
+        },
+        "compression_stratum": {
+          "unknown": {
+            "estimate": null,
+            "low": null,
+            "high": null,
+            "n_tasks": 0,
+            "n_observations": 0
+          }
+        }
+      },
+      "failure_taxonomy_counts": {
+        "pipeline_or_transport_error": 189
+      },
+      "compressed_length_observations": 0,
+      "compressed_tokens_median": null,
+      "over_nominal_budget": 0,
+      "cer_median": null,
+      "local_text_token_counts": {
+        "prompt_tokens": 0,
+        "output_tokens": 0
+      },
+      "missing_local_usage_counts": {},
+      "token_count_method": "tiktoken:o200k_base",
+      "usage_is_billed_provider_usage": false
+    },
+    {
+      "condition": "allowlist",
+      "run_id": "run2-primary-allowlist",
+      "selected_tasks": 63,
+      "expected_trials": 189,
+      "observed_trials": 189,
+      "scored_trials": 0,
+      "missing_trials": 0,
+      "api_or_pipeline_failures": 189,
+      "orphan_call_groups": 0,
+      "scored_trials_with_incomplete_stage_traces": 0,
+      "task_success": {
+        "estimate": null,
+        "low": null,
+        "high": null,
+        "n_tasks": 0,
+        "n_observations": 0
+      },
+      "observed_task_success_rate": null,
+      "macro_task_call_completion": {
+        "estimate": null,
+        "low": null,
+        "high": null,
+        "n_tasks": 0,
+        "n_observations": 0
+      },
+      "required_call_hit_rate": null,
+      "required_hits": 0,
+      "required_calls": 0,
+      "repeat_task_success": {
+        "0": null,
+        "1": null,
+        "2": null
+      },
+      "group_task_success": {
+        "suite": {
+          "banking": {
+            "estimate": null,
+            "low": null,
+            "high": null,
+            "n_tasks": 0,
+            "n_observations": 0
+          },
+          "slack": {
+            "estimate": null,
+            "low": null,
+            "high": null,
+            "n_tasks": 0,
+            "n_observations": 0
+          },
+          "travel": {
+            "estimate": null,
+            "low": null,
+            "high": null,
+            "n_tasks": 0,
+            "n_observations": 0
+          },
+          "workspace": {
+            "estimate": null,
+            "low": null,
+            "high": null,
+            "n_tasks": 0,
+            "n_observations": 0
+          }
+        },
+        "compression_stratum": {
+          "unknown": {
+            "estimate": null,
+            "low": null,
+            "high": null,
+            "n_tasks": 0,
+            "n_observations": 0
+          }
+        }
+      },
+      "failure_taxonomy_counts": {
+        "pipeline_or_transport_error": 189
+      },
+      "compressed_length_observations": 0,
+      "compressed_tokens_median": null,
+      "over_nominal_budget": 0,
+      "cer_median": null,
+      "local_text_token_counts": {
+        "prompt_tokens": 0,
+        "output_tokens": 0
+      },
+      "missing_local_usage_counts": {},
+      "token_count_method": "tiktoken:o200k_base",
+      "usage_is_billed_provider_usage": false
+    }
+  ],
+  "comparisons": [
+    {
+      "estimate": null,
+      "low": null,
+      "high": null,
+      "n_tasks": 0,
+      "n_pairs": 0,
+      "baseline_only": 0,
+      "treatment_only": 0,
+      "regressions": 0,
+      "improvements": 0,
+      "n00": 0,
+      "n01": 0,
+      "n10": 0,
+      "n11": 0,
+      "n_discordant": 0,
+      "outcome_definition": {
+        "00": "baseline=0,treatment=0",
+        "01": "baseline=0,treatment=1",
+        "10": "baseline=1,treatment=0",
+        "11": "baseline=1,treatment=1"
+      },
+      "per_pair": [],
+      "per_task": [],
+      "baseline_only_slots": [],
+      "treatment_only_slots": [],
+      "condition": "sliding_window",
+      "baseline_condition": "none",
+      "primary_contrast": true,
+      "interpretation": "same task/repeat and byte-identical upstream handoff; task-cluster uncertainty"
+    },
+    {
+      "estimate": null,
+      "low": null,
+      "high": null,
+      "n_tasks": 0,
+      "n_pairs": 0,
+      "baseline_only": 0,
+      "treatment_only": 0,
+      "regressions": 0,
+      "improvements": 0,
+      "n00": 0,
+      "n01": 0,
+      "n10": 0,
+      "n11": 0,
+      "n_discordant": 0,
+      "outcome_definition": {
+        "00": "baseline=0,treatment=0",
+        "01": "baseline=0,treatment=1",
+        "10": "baseline=1,treatment=0",
+        "11": "baseline=1,treatment=1"
+      },
+      "per_pair": [],
+      "per_task": [],
+      "baseline_only_slots": [],
+      "treatment_only_slots": [],
+      "condition": "unconditional",
+      "baseline_condition": "none",
+      "primary_contrast": true,
+      "interpretation": "same task/repeat and byte-identical upstream handoff; task-cluster uncertainty"
+    },
+    {
+      "estimate": null,
+      "low": null,
+      "high": null,
+      "n_tasks": 0,
+      "n_pairs": 0,
+      "baseline_only": 0,
+      "treatment_only": 0,
+      "regressions": 0,
+      "improvements": 0,
+      "n00": 0,
+      "n01": 0,
+      "n10": 0,
+      "n11": 0,
+      "n_discordant": 0,
+      "outcome_definition": {
+        "00": "baseline=0,treatment=0",
+        "01": "baseline=0,treatment=1",
+        "10": "baseline=1,treatment=0",
+        "11": "baseline=1,treatment=1"
+      },
+      "per_pair": [],
+      "per_task": [],
+      "baseline_only_slots": [],
+      "treatment_only_slots": [],
+      "condition": "destination",
+      "baseline_condition": "none",
+      "primary_contrast": true,
+      "interpretation": "same task/repeat and byte-identical upstream handoff; task-cluster uncertainty"
+    },
+    {
+      "estimate": null,
+      "low": null,
+      "high": null,
+      "n_tasks": 0,
+      "n_pairs": 0,
+      "baseline_only": 0,
+      "treatment_only": 0,
+      "regressions": 0,
+      "improvements": 0,
+      "n00": 0,
+      "n01": 0,
+      "n10": 0,
+      "n11": 0,
+      "n_discordant": 0,
+      "outcome_definition": {
+        "00": "baseline=0,treatment=0",
+        "01": "baseline=0,treatment=1",
+        "10": "baseline=1,treatment=0",
+        "11": "baseline=1,treatment=1"
+      },
+      "per_pair": [],
+      "per_task": [],
+      "baseline_only_slots": [],
+      "treatment_only_slots": [],
+      "condition": "instruction_strip",
+      "baseline_condition": "none",
+      "primary_contrast": true,
+      "interpretation": "same task/repeat and byte-identical upstream handoff; task-cluster uncertainty"
+    },
+    {
+      "estimate": null,
+      "low": null,
+      "high": null,
+      "n_tasks": 0,
+      "n_pairs": 0,
+      "baseline_only": 0,
+      "treatment_only": 0,
+      "regressions": 0,
+      "improvements": 0,
+      "n00": 0,
+      "n01": 0,
+      "n10": 0,
+      "n11": 0,
+      "n_discordant": 0,
+      "outcome_definition": {
+        "00": "baseline=0,treatment=0",
+        "01": "baseline=0,treatment=1",
+        "10": "baseline=1,treatment=0",
+        "11": "baseline=1,treatment=1"
+      },
+      "per_pair": [],
+      "per_task": [],
+      "baseline_only_slots": [],
+      "treatment_only_slots": [],
+      "condition": "allowlist",
+      "baseline_condition": "none",
+      "primary_contrast": true,
+      "interpretation": "same task/repeat and byte-identical upstream handoff; task-cluster uncertainty"
+    },
+    {
+      "estimate": null,
+      "low": null,
+      "high": null,
+      "n_tasks": 0,
+      "n_pairs": 0,
+      "baseline_only": 0,
+      "treatment_only": 0,
+      "regressions": 0,
+      "improvements": 0,
+      "n00": 0,
+      "n01": 0,
+      "n10": 0,
+      "n11": 0,
+      "n_discordant": 0,
+      "outcome_definition": {
+        "00": "baseline=0,treatment=0",
+        "01": "baseline=0,treatment=1",
+        "10": "baseline=1,treatment=0",
+        "11": "baseline=1,treatment=1"
+      },
+      "per_pair": [],
+      "per_task": [],
+      "baseline_only_slots": [],
+      "treatment_only_slots": [],
+      "condition": "unconditional",
+      "baseline_condition": "sliding_window",
+      "primary_contrast": false,
+      "interpretation": "same task/repeat and byte-identical upstream handoff; task-cluster uncertainty"
+    },
+    {
+      "estimate": null,
+      "low": null,
+      "high": null,
+      "n_tasks": 0,
+      "n_pairs": 0,
+      "baseline_only": 0,
+      "treatment_only": 0,
+      "regressions": 0,
+      "improvements": 0,
+      "n00": 0,
+      "n01": 0,
+      "n10": 0,
+      "n11": 0,
+      "n_discordant": 0,
+      "outcome_definition": {
+        "00": "baseline=0,treatment=0",
+        "01": "baseline=0,treatment=1",
+        "10": "baseline=1,treatment=0",
+        "11": "baseline=1,treatment=1"
+      },
+      "per_pair": [],
+      "per_task": [],
+      "baseline_only_slots": [],
+      "treatment_only_slots": [],
+      "condition": "destination",
+      "baseline_condition": "sliding_window",
+      "primary_contrast": false,
+      "interpretation": "same task/repeat and byte-identical upstream handoff; task-cluster uncertainty"
+    },
+    {
+      "estimate": null,
+      "low": null,
+      "high": null,
+      "n_tasks": 0,
+      "n_pairs": 0,
+      "baseline_only": 0,
+      "treatment_only": 0,
+      "regressions": 0,
+      "improvements": 0,
+      "n00": 0,
+      "n01": 0,
+      "n10": 0,
+      "n11": 0,
+      "n_discordant": 0,
+      "outcome_definition": {
+        "00": "baseline=0,treatment=0",
+        "01": "baseline=0,treatment=1",
+        "10": "baseline=1,treatment=0",
+        "11": "baseline=1,treatment=1"
+      },
+      "per_pair": [],
+      "per_task": [],
+      "baseline_only_slots": [],
+      "treatment_only_slots": [],
+      "condition": "instruction_strip",
+      "baseline_condition": "sliding_window",
+      "primary_contrast": false,
+      "interpretation": "same task/repeat and byte-identical upstream handoff; task-cluster uncertainty"
+    },
+    {
+      "estimate": null,
+      "low": null,
+      "high": null,
+      "n_tasks": 0,
+      "n_pairs": 0,
+      "baseline_only": 0,
+      "treatment_only": 0,
+      "regressions": 0,
+      "improvements": 0,
+      "n00": 0,
+      "n01": 0,
+      "n10": 0,
+      "n11": 0,
+      "n_discordant": 0,
+      "outcome_definition": {
+        "00": "baseline=0,treatment=0",
+        "01": "baseline=0,treatment=1",
+        "10": "baseline=1,treatment=0",
+        "11": "baseline=1,treatment=1"
+      },
+      "per_pair": [],
+      "per_task": [],
+      "baseline_only_slots": [],
+      "treatment_only_slots": [],
+      "condition": "allowlist",
+      "baseline_condition": "sliding_window",
+      "primary_contrast": false,
+      "interpretation": "same task/repeat and byte-identical upstream handoff; task-cluster uncertainty"
+    },
+    {
+      "estimate": null,
+      "low": null,
+      "high": null,
+      "n_tasks": 0,
+      "n_pairs": 0,
+      "baseline_only": 0,
+      "treatment_only": 0,
+      "regressions": 0,
+      "improvements": 0,
+      "n00": 0,
+      "n01": 0,
+      "n10": 0,
+      "n11": 0,
+      "n_discordant": 0,
+      "outcome_definition": {
+        "00": "baseline=0,treatment=0",
+        "01": "baseline=0,treatment=1",
+        "10": "baseline=1,treatment=0",
+        "11": "baseline=1,treatment=1"
+      },
+      "per_pair": [],
+      "per_task": [],
+      "baseline_only_slots": [],
+      "treatment_only_slots": [],
+      "condition": "destination",
+      "baseline_condition": "unconditional",
+      "primary_contrast": false,
+      "interpretation": "same task/repeat and byte-identical upstream handoff; task-cluster uncertainty"
+    },
+    {
+      "estimate": null,
+      "low": null,
+      "high": null,
+      "n_tasks": 0,
+      "n_pairs": 0,
+      "baseline_only": 0,
+      "treatment_only": 0,
+      "regressions": 0,
+      "improvements": 0,
+      "n00": 0,
+      "n01": 0,
+      "n10": 0,
+      "n11": 0,
+      "n_discordant": 0,
+      "outcome_definition": {
+        "00": "baseline=0,treatment=0",
+        "01": "baseline=0,treatment=1",
+        "10": "baseline=1,treatment=0",
+        "11": "baseline=1,treatment=1"
+      },
+      "per_pair": [],
+      "per_task": [],
+      "baseline_only_slots": [],
+      "treatment_only_slots": [],
+      "condition": "instruction_strip",
+      "baseline_condition": "unconditional",
+      "primary_contrast": false,
+      "interpretation": "same task/repeat and byte-identical upstream handoff; task-cluster uncertainty"
+    },
+    {
+      "estimate": null,
+      "low": null,
+      "high": null,
+      "n_tasks": 0,
+      "n_pairs": 0,
+      "baseline_only": 0,
+      "treatment_only": 0,
+      "regressions": 0,
+      "improvements": 0,
+      "n00": 0,
+      "n01": 0,
+      "n10": 0,
+      "n11": 0,
+      "n_discordant": 0,
+      "outcome_definition": {
+        "00": "baseline=0,treatment=0",
+        "01": "baseline=0,treatment=1",
+        "10": "baseline=1,treatment=0",
+        "11": "baseline=1,treatment=1"
+      },
+      "per_pair": [],
+      "per_task": [],
+      "baseline_only_slots": [],
+      "treatment_only_slots": [],
+      "condition": "allowlist",
+      "baseline_condition": "unconditional",
+      "primary_contrast": false,
+      "interpretation": "same task/repeat and byte-identical upstream handoff; task-cluster uncertainty"
+    },
+    {
+      "estimate": null,
+      "low": null,
+      "high": null,
+      "n_tasks": 0,
+      "n_pairs": 0,
+      "baseline_only": 0,
+      "treatment_only": 0,
+      "regressions": 0,
+      "improvements": 0,
+      "n00": 0,
+      "n01": 0,
+      "n10": 0,
+      "n11": 0,
+      "n_discordant": 0,
+      "outcome_definition": {
+        "00": "baseline=0,treatment=0",
+        "01": "baseline=0,treatment=1",
+        "10": "baseline=1,treatment=0",
+        "11": "baseline=1,treatment=1"
+      },
+      "per_pair": [],
+      "per_task": [],
+      "baseline_only_slots": [],
+      "treatment_only_slots": [],
+      "condition": "instruction_strip",
+      "baseline_condition": "destination",
+      "primary_contrast": false,
+      "interpretation": "same task/repeat and byte-identical upstream handoff; task-cluster uncertainty"
+    },
+    {
+      "estimate": null,
+      "low": null,
+      "high": null,
+      "n_tasks": 0,
+      "n_pairs": 0,
+      "baseline_only": 0,
+      "treatment_only": 0,
+      "regressions": 0,
+      "improvements": 0,
+      "n00": 0,
+      "n01": 0,
+      "n10": 0,
+      "n11": 0,
+      "n_discordant": 0,
+      "outcome_definition": {
+        "00": "baseline=0,treatment=0",
+        "01": "baseline=0,treatment=1",
+        "10": "baseline=1,treatment=0",
+        "11": "baseline=1,treatment=1"
+      },
+      "per_pair": [],
+      "per_task": [],
+      "baseline_only_slots": [],
+      "treatment_only_slots": [],
+      "condition": "allowlist",
+      "baseline_condition": "destination",
+      "primary_contrast": false,
+      "interpretation": "same task/repeat and byte-identical upstream handoff; task-cluster uncertainty"
+    },
+    {
+      "estimate": null,
+      "low": null,
+      "high": null,
+      "n_tasks": 0,
+      "n_pairs": 0,
+      "baseline_only": 0,
+      "treatment_only": 0,
+      "regressions": 0,
+      "improvements": 0,
+      "n00": 0,
+      "n01": 0,
+      "n10": 0,
+      "n11": 0,
+      "n_discordant": 0,
+      "outcome_definition": {
+        "00": "baseline=0,treatment=0",
+        "01": "baseline=0,treatment=1",
+        "10": "baseline=1,treatment=0",
+        "11": "baseline=1,treatment=1"
+      },
+      "per_pair": [],
+      "per_task": [],
+      "baseline_only_slots": [],
+      "treatment_only_slots": [],
+      "condition": "allowlist",
+      "baseline_condition": "instruction_strip",
+      "primary_contrast": false,
+      "interpretation": "same task/repeat and byte-identical upstream handoff; task-cluster uncertainty"
+    }
+  ],
+  "execution_local_text_token_counts": {
+    "prompt_tokens": 878814,
+    "output_tokens": 0
+  },
+  "baseline_available": true,
+  "provenance": {
+    "analysis_tasks_path": "/Users/yiboyang/Desktop/algoverse-mas-compression/tasks/sample_tasks_63.json",
+    "analysis_tasks_sha256": "eb78f48f100b05c3277bb748a5a8e78e81981bfe00532063e570ee4d99090eed",
+    "analysis_dataset_task_count": 63,
+    "analysis_code_sha256": {
+      "analyze_redesign.py": "0deefb352fec829e13befbcfbc2de49ae0b03201bb6d872a5e2e2175ab863139",
+      "analysis_stats.py": "d317674003be93d9649911ea3bd37f9d3ebcec3feab326b735242b9b00dce47b",
+      "failure_taxonomy.py": "98fc864a2036d412b55e5114065b68d21ccdad03d6c9dfa717d43ea2c1d0140a",
+      "shared_run.py": "0a9847e20c92e61a8d41e5546334d50fdd83e2bb9ec7bc781062ba4ff2062240",
+      "baseline.py": "4e5314ed06b4f048456e61a73afcfbc252a526b671570c705d6ba9d0f0a2b16b",
+      "failure_stage.py": "fe5d62741314663b0fb8f992b50d0416b95d1e381e552022e76860831de6505e",
+      "obtainable.py": "986cb905da69c2efde618d0c60b8bac7cba402a016ccab793f45d0255451bb55",
+      "pipeline.py": "3afc4c0b86f4a172e9ede8898d849fe8ecd3788e2429183de77079097fac8cb8",
+      "compressors.py": "eeaa6e8b5bb0e7a11753248419b67ca091b356edb6190ade9a2caca1779b3b71",
+      "suite_tools.py": "6106e98b47772a0ef0765e6082e9dea6d37e6e141c543231b3c50f9d0e526cd4",
+      "config.py": "26957d89dd09ef0f34b3fa882feb6d5057a3d06e775d2c0d34ee7f9b19fc3808"
+    },
+    "python_version": "3.9.6",
+    "bootstrap_draws": 2000,
+    "bootstrap_seed": 1729,
+    "interval": "95% percentile bootstrap; whole tasks resampled with their repeats",
+    "config_serialization": "nonfinite upstream CER bounds are represented as strings; input hashes preserve exact original bytes",
+    "runs": [
+      {
+        "path": "/Users/yiboyang/Desktop/algoverse-mas-compression/results/run2/run2_primary/arms/none",
+        "config": {
+          "attack_enabled": false,
+          "backend": "openai",
+          "cer_strata": [
+            [
+              "unexposed",
+              [
+                0.0,
+                1.0
+              ]
+            ],
+            [
+              "weak",
+              [
+                1.0,
+                1.5
+              ]
+            ],
+            [
+              "moderate",
+              [
+                1.5,
+                3.0
+              ]
+            ],
+            [
+              "strong",
+              [
+                3.0,
+                "inf"
+              ]
+            ]
+          ],
+          "compressor_budget_tokens": 150,
+          "compressor_model": "gpt-4o-mini",
+          "condition": "none",
+          "controls_enabled": true,
+          "dataset_sha256": "eb78f48f100b05c3277bb748a5a8e78e81981bfe00532063e570ee4d99090eed",
+          "design": "shared-handoff-primary",
+          "experiment_id": "run2-primary",
+          "experiment_mode": "stress_test",
+          "git_branch": "compression-redesign",
+          "git_commit": "80725de345d0be47b3a671814c343a6198e7d65f",
+          "git_dirty": true,
+          "handoff_regime": "plan",
+          "manifest_sha256": "aa4030a831da2c5120f7a32b4a95c9b70bfbf38d5f32b368113a23edd999e36a",
+          "model": "gpt-4o-mini",
+          "output_dir": "/Users/yiboyang/Desktop/algoverse-mas-compression/results/run2/run2_primary/arms",
+          "primary_cer_min": 1.5,
+          "prompt_hashes": {
+            "agent1": "0dd82941f7cb",
+            "agent2_template": "a5c75b9200b6"
+          },
+          "repeats": 3,
+          "require_measured_tokens": true,
+          "run_id": "run2-primary-none",
+          "seed": null,
+          "seed_policy": "unset_native_default_not_bit_reproducible",
+          "shared_agent1_trace_dir": "../../shared_agent1",
+          "shared_handoffs_file": "../../handoffs.jsonl",
+          "started_at": "2026-11-03T14:21:40Z",
+          "suites": [
+            "workspace",
+            "slack",
+            "banking",
+            "travel"
+          ],
+          "synthetic_expansion": true,
+          "task_ids": [
+            "ws_6",
+            "ws_7",
+            "ws_8",
+            "ws_9",
+            "ws_12",
+            "ws_21",
+            "ws_29",
+            "ws_31",
+            "ws_15",
+            "ws_18",
+            "ws_34",
+            "ws_20",
+            "ws_33",
+            "ws_25",
+            "ws_13",
+            "ws_4",
+            "ws_19",
+            "ws_36",
+            "sl_1",
+            "sl_2",
+            "sl_3",
+            "sl_4",
+            "sl_6",
+            "sl_8",
+            "sl_11",
+            "sl_13",
+            "sl_14",
+            "sl_15",
+            "sl_16",
+            "sl_17",
+            "sl_18",
+            "sl_19",
+            "sl_20",
+            "bk_0",
+            "bk_2",
+            "bk_3",
+            "bk_4",
+            "bk_5",
+            "bk_6",
+            "bk_9",
+            "bk_11",
+            "bk_12",
+            "bk_13",
+            "bk_14",
+            "bk_15",
+            "tr_0",
+            "tr_1",
+            "tr_3",
+            "tr_4",
+            "tr_7",
+            "tr_8",
+            "bk_h1",
+            "bk_h2",
+            "bk_h3",
+            "bk_h4",
+            "bk_h5",
+            "bk_h6",
+            "bk_h7",
+            "bk_h8",
+            "bk_h9",
+            "bk_h10",
+            "bk_h11",
+            "bk_h12"
+          ],
+          "tasks_file": "tasks/sample_tasks_63.json",
+          "temperature": 0.0,
+          "token_count_method": "tiktoken:o200k_base",
+          "workers": 4
+        },
+        "input_hashes": {
+          "config.json": "9407a137127fef64c288559f9bdb66a6aa0f78c2dc06fde33988d6a429990c9f",
+          "runs.jsonl": "0d21e023ad345bc7aa157fef2ad9718abccb3a8616b61ee9447bbdceb92df715",
+          "calls.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "dataset_status": "unverified: matches commit, but executed tree was dirty",
+        "missing": [],
+        "orphan_calls": []
+      },
+      {
+        "path": "/Users/yiboyang/Desktop/algoverse-mas-compression/results/run2/run2_primary/arms/sliding_window",
+        "config": {
+          "attack_enabled": false,
+          "backend": "openai",
+          "cer_strata": [
+            [
+              "unexposed",
+              [
+                0.0,
+                1.0
+              ]
+            ],
+            [
+              "weak",
+              [
+                1.0,
+                1.5
+              ]
+            ],
+            [
+              "moderate",
+              [
+                1.5,
+                3.0
+              ]
+            ],
+            [
+              "strong",
+              [
+                3.0,
+                "inf"
+              ]
+            ]
+          ],
+          "compressor_budget_tokens": 150,
+          "compressor_model": "gpt-4o-mini",
+          "condition": "sliding_window",
+          "controls_enabled": true,
+          "dataset_sha256": "eb78f48f100b05c3277bb748a5a8e78e81981bfe00532063e570ee4d99090eed",
+          "design": "shared-handoff-primary",
+          "experiment_id": "run2-primary",
+          "experiment_mode": "stress_test",
+          "git_branch": "compression-redesign",
+          "git_commit": "80725de345d0be47b3a671814c343a6198e7d65f",
+          "git_dirty": true,
+          "handoff_regime": "plan",
+          "manifest_sha256": "aa4030a831da2c5120f7a32b4a95c9b70bfbf38d5f32b368113a23edd999e36a",
+          "model": "gpt-4o-mini",
+          "output_dir": "/Users/yiboyang/Desktop/algoverse-mas-compression/results/run2/run2_primary/arms",
+          "primary_cer_min": 1.5,
+          "prompt_hashes": {
+            "agent1": "0dd82941f7cb",
+            "agent2_template": "a5c75b9200b6"
+          },
+          "repeats": 3,
+          "require_measured_tokens": true,
+          "run_id": "run2-primary-sliding_window",
+          "seed": null,
+          "seed_policy": "unset_native_default_not_bit_reproducible",
+          "shared_agent1_trace_dir": "../../shared_agent1",
+          "shared_handoffs_file": "../../handoffs.jsonl",
+          "started_at": "2026-11-03T14:21:40Z",
+          "suites": [
+            "workspace",
+            "slack",
+            "banking",
+            "travel"
+          ],
+          "synthetic_expansion": true,
+          "task_ids": [
+            "ws_6",
+            "ws_7",
+            "ws_8",
+            "ws_9",
+            "ws_12",
+            "ws_21",
+            "ws_29",
+            "ws_31",
+            "ws_15",
+            "ws_18",
+            "ws_34",
+            "ws_20",
+            "ws_33",
+            "ws_25",
+            "ws_13",
+            "ws_4",
+            "ws_19",
+            "ws_36",
+            "sl_1",
+            "sl_2",
+            "sl_3",
+            "sl_4",
+            "sl_6",
+            "sl_8",
+            "sl_11",
+            "sl_13",
+            "sl_14",
+            "sl_15",
+            "sl_16",
+            "sl_17",
+            "sl_18",
+            "sl_19",
+            "sl_20",
+            "bk_0",
+            "bk_2",
+            "bk_3",
+            "bk_4",
+            "bk_5",
+            "bk_6",
+            "bk_9",
+            "bk_11",
+            "bk_12",
+            "bk_13",
+            "bk_14",
+            "bk_15",
+            "tr_0",
+            "tr_1",
+            "tr_3",
+            "tr_4",
+            "tr_7",
+            "tr_8",
+            "bk_h1",
+            "bk_h2",
+            "bk_h3",
+            "bk_h4",
+            "bk_h5",
+            "bk_h6",
+            "bk_h7",
+            "bk_h8",
+            "bk_h9",
+            "bk_h10",
+            "bk_h11",
+            "bk_h12"
+          ],
+          "tasks_file": "tasks/sample_tasks_63.json",
+          "temperature": 0.0,
+          "token_count_method": "tiktoken:o200k_base",
+          "workers": 4
+        },
+        "input_hashes": {
+          "config.json": "86598ff4531e35d686b73e90a73fae02909d32cf0e0973a32f02189119a79af0",
+          "runs.jsonl": "cf0b8360629f65f7dfc663ea975d76fef47b87b42d9665b08e3c19fd4d1f9d68",
+          "calls.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "dataset_status": "unverified: matches commit, but executed tree was dirty",
+        "missing": [],
+        "orphan_calls": []
+      },
+      {
+        "path": "/Users/yiboyang/Desktop/algoverse-mas-compression/results/run2/run2_primary/arms/unconditional",
+        "config": {
+          "attack_enabled": false,
+          "backend": "openai",
+          "cer_strata": [
+            [
+              "unexposed",
+              [
+                0.0,
+                1.0
+              ]
+            ],
+            [
+              "weak",
+              [
+                1.0,
+                1.5
+              ]
+            ],
+            [
+              "moderate",
+              [
+                1.5,
+                3.0
+              ]
+            ],
+            [
+              "strong",
+              [
+                3.0,
+                "inf"
+              ]
+            ]
+          ],
+          "compressor_budget_tokens": 150,
+          "compressor_model": "gpt-4o-mini",
+          "condition": "unconditional",
+          "controls_enabled": true,
+          "dataset_sha256": "eb78f48f100b05c3277bb748a5a8e78e81981bfe00532063e570ee4d99090eed",
+          "design": "shared-handoff-primary",
+          "experiment_id": "run2-primary",
+          "experiment_mode": "stress_test",
+          "git_branch": "compression-redesign",
+          "git_commit": "80725de345d0be47b3a671814c343a6198e7d65f",
+          "git_dirty": true,
+          "handoff_regime": "plan",
+          "manifest_sha256": "aa4030a831da2c5120f7a32b4a95c9b70bfbf38d5f32b368113a23edd999e36a",
+          "model": "gpt-4o-mini",
+          "output_dir": "/Users/yiboyang/Desktop/algoverse-mas-compression/results/run2/run2_primary/arms",
+          "primary_cer_min": 1.5,
+          "prompt_hashes": {
+            "agent1": "0dd82941f7cb",
+            "agent2_template": "a5c75b9200b6"
+          },
+          "repeats": 3,
+          "require_measured_tokens": true,
+          "run_id": "run2-primary-unconditional",
+          "seed": null,
+          "seed_policy": "unset_native_default_not_bit_reproducible",
+          "shared_agent1_trace_dir": "../../shared_agent1",
+          "shared_handoffs_file": "../../handoffs.jsonl",
+          "started_at": "2026-11-03T14:21:40Z",
+          "suites": [
+            "workspace",
+            "slack",
+            "banking",
+            "travel"
+          ],
+          "synthetic_expansion": true,
+          "task_ids": [
+            "ws_6",
+            "ws_7",
+            "ws_8",
+            "ws_9",
+            "ws_12",
+            "ws_21",
+            "ws_29",
+            "ws_31",
+            "ws_15",
+            "ws_18",
+            "ws_34",
+            "ws_20",
+            "ws_33",
+            "ws_25",
+            "ws_13",
+            "ws_4",
+            "ws_19",
+            "ws_36",
+            "sl_1",
+            "sl_2",
+            "sl_3",
+            "sl_4",
+            "sl_6",
+            "sl_8",
+            "sl_11",
+            "sl_13",
+            "sl_14",
+            "sl_15",
+            "sl_16",
+            "sl_17",
+            "sl_18",
+            "sl_19",
+            "sl_20",
+            "bk_0",
+            "bk_2",
+            "bk_3",
+            "bk_4",
+            "bk_5",
+            "bk_6",
+            "bk_9",
+            "bk_11",
+            "bk_12",
+            "bk_13",
+            "bk_14",
+            "bk_15",
+            "tr_0",
+            "tr_1",
+            "tr_3",
+            "tr_4",
+            "tr_7",
+            "tr_8",
+            "bk_h1",
+            "bk_h2",
+            "bk_h3",
+            "bk_h4",
+            "bk_h5",
+            "bk_h6",
+            "bk_h7",
+            "bk_h8",
+            "bk_h9",
+            "bk_h10",
+            "bk_h11",
+            "bk_h12"
+          ],
+          "tasks_file": "tasks/sample_tasks_63.json",
+          "temperature": 0.0,
+          "token_count_method": "tiktoken:o200k_base",
+          "workers": 4
+        },
+        "input_hashes": {
+          "config.json": "48667c22e69d3b369d3243ab770ade0b0335608ee0d95d9209cfacc0fe935787",
+          "runs.jsonl": "ede5cc2505596a187cc75ccf1c3f19253bb8a69d946b7c7df80c1d27ceb95d6e",
+          "calls.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "dataset_status": "unverified: matches commit, but executed tree was dirty",
+        "missing": [],
+        "orphan_calls": []
+      },
+      {
+        "path": "/Users/yiboyang/Desktop/algoverse-mas-compression/results/run2/run2_primary/arms/destination",
+        "config": {
+          "attack_enabled": false,
+          "backend": "openai",
+          "cer_strata": [
+            [
+              "unexposed",
+              [
+                0.0,
+                1.0
+              ]
+            ],
+            [
+              "weak",
+              [
+                1.0,
+                1.5
+              ]
+            ],
+            [
+              "moderate",
+              [
+                1.5,
+                3.0
+              ]
+            ],
+            [
+              "strong",
+              [
+                3.0,
+                "inf"
+              ]
+            ]
+          ],
+          "compressor_budget_tokens": 150,
+          "compressor_model": "gpt-4o-mini",
+          "condition": "destination",
+          "controls_enabled": true,
+          "dataset_sha256": "eb78f48f100b05c3277bb748a5a8e78e81981bfe00532063e570ee4d99090eed",
+          "design": "shared-handoff-primary",
+          "experiment_id": "run2-primary",
+          "experiment_mode": "stress_test",
+          "git_branch": "compression-redesign",
+          "git_commit": "80725de345d0be47b3a671814c343a6198e7d65f",
+          "git_dirty": true,
+          "handoff_regime": "plan",
+          "manifest_sha256": "aa4030a831da2c5120f7a32b4a95c9b70bfbf38d5f32b368113a23edd999e36a",
+          "model": "gpt-4o-mini",
+          "output_dir": "/Users/yiboyang/Desktop/algoverse-mas-compression/results/run2/run2_primary/arms",
+          "primary_cer_min": 1.5,
+          "prompt_hashes": {
+            "agent1": "0dd82941f7cb",
+            "agent2_template": "a5c75b9200b6"
+          },
+          "repeats": 3,
+          "require_measured_tokens": true,
+          "run_id": "run2-primary-destination",
+          "seed": null,
+          "seed_policy": "unset_native_default_not_bit_reproducible",
+          "shared_agent1_trace_dir": "../../shared_agent1",
+          "shared_handoffs_file": "../../handoffs.jsonl",
+          "started_at": "2026-11-03T14:21:40Z",
+          "suites": [
+            "workspace",
+            "slack",
+            "banking",
+            "travel"
+          ],
+          "synthetic_expansion": true,
+          "task_ids": [
+            "ws_6",
+            "ws_7",
+            "ws_8",
+            "ws_9",
+            "ws_12",
+            "ws_21",
+            "ws_29",
+            "ws_31",
+            "ws_15",
+            "ws_18",
+            "ws_34",
+            "ws_20",
+            "ws_33",
+            "ws_25",
+            "ws_13",
+            "ws_4",
+            "ws_19",
+            "ws_36",
+            "sl_1",
+            "sl_2",
+            "sl_3",
+            "sl_4",
+            "sl_6",
+            "sl_8",
+            "sl_11",
+            "sl_13",
+            "sl_14",
+            "sl_15",
+            "sl_16",
+            "sl_17",
+            "sl_18",
+            "sl_19",
+            "sl_20",
+            "bk_0",
+            "bk_2",
+            "bk_3",
+            "bk_4",
+            "bk_5",
+            "bk_6",
+            "bk_9",
+            "bk_11",
+            "bk_12",
+            "bk_13",
+            "bk_14",
+            "bk_15",
+            "tr_0",
+            "tr_1",
+            "tr_3",
+            "tr_4",
+            "tr_7",
+            "tr_8",
+            "bk_h1",
+            "bk_h2",
+            "bk_h3",
+            "bk_h4",
+            "bk_h5",
+            "bk_h6",
+            "bk_h7",
+            "bk_h8",
+            "bk_h9",
+            "bk_h10",
+            "bk_h11",
+            "bk_h12"
+          ],
+          "tasks_file": "tasks/sample_tasks_63.json",
+          "temperature": 0.0,
+          "token_count_method": "tiktoken:o200k_base",
+          "workers": 4
+        },
+        "input_hashes": {
+          "config.json": "fadc682ef3d469eb6f3a56e7c2fa1a0ea665aaeacdb05fd9252e37adad7526f5",
+          "runs.jsonl": "bb8c254a56e6daea78f373a52efbb1dd8b7ddcac1e829ca0a28a00c70f5b7082",
+          "calls.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "dataset_status": "unverified: matches commit, but executed tree was dirty",
+        "missing": [],
+        "orphan_calls": []
+      },
+      {
+        "path": "/Users/yiboyang/Desktop/algoverse-mas-compression/results/run2/run2_primary/arms/instruction_strip",
+        "config": {
+          "attack_enabled": false,
+          "backend": "openai",
+          "cer_strata": [
+            [
+              "unexposed",
+              [
+                0.0,
+                1.0
+              ]
+            ],
+            [
+              "weak",
+              [
+                1.0,
+                1.5
+              ]
+            ],
+            [
+              "moderate",
+              [
+                1.5,
+                3.0
+              ]
+            ],
+            [
+              "strong",
+              [
+                3.0,
+                "inf"
+              ]
+            ]
+          ],
+          "compressor_budget_tokens": 150,
+          "compressor_model": "gpt-4o-mini",
+          "condition": "instruction_strip",
+          "controls_enabled": true,
+          "dataset_sha256": "eb78f48f100b05c3277bb748a5a8e78e81981bfe00532063e570ee4d99090eed",
+          "design": "shared-handoff-primary",
+          "experiment_id": "run2-primary",
+          "experiment_mode": "stress_test",
+          "git_branch": "compression-redesign",
+          "git_commit": "80725de345d0be47b3a671814c343a6198e7d65f",
+          "git_dirty": true,
+          "handoff_regime": "plan",
+          "manifest_sha256": "aa4030a831da2c5120f7a32b4a95c9b70bfbf38d5f32b368113a23edd999e36a",
+          "model": "gpt-4o-mini",
+          "output_dir": "/Users/yiboyang/Desktop/algoverse-mas-compression/results/run2/run2_primary/arms",
+          "primary_cer_min": 1.5,
+          "prompt_hashes": {
+            "agent1": "0dd82941f7cb",
+            "agent2_template": "a5c75b9200b6"
+          },
+          "repeats": 3,
+          "require_measured_tokens": true,
+          "run_id": "run2-primary-instruction_strip",
+          "seed": null,
+          "seed_policy": "unset_native_default_not_bit_reproducible",
+          "shared_agent1_trace_dir": "../../shared_agent1",
+          "shared_handoffs_file": "../../handoffs.jsonl",
+          "started_at": "2026-11-03T14:21:40Z",
+          "suites": [
+            "workspace",
+            "slack",
+            "banking",
+            "travel"
+          ],
+          "synthetic_expansion": true,
+          "task_ids": [
+            "ws_6",
+            "ws_7",
+            "ws_8",
+            "ws_9",
+            "ws_12",
+            "ws_21",
+            "ws_29",
+            "ws_31",
+            "ws_15",
+            "ws_18",
+            "ws_34",
+            "ws_20",
+            "ws_33",
+            "ws_25",
+            "ws_13",
+            "ws_4",
+            "ws_19",
+            "ws_36",
+            "sl_1",
+            "sl_2",
+            "sl_3",
+            "sl_4",
+            "sl_6",
+            "sl_8",
+            "sl_11",
+            "sl_13",
+            "sl_14",
+            "sl_15",
+            "sl_16",
+            "sl_17",
+            "sl_18",
+            "sl_19",
+            "sl_20",
+            "bk_0",
+            "bk_2",
+            "bk_3",
+            "bk_4",
+            "bk_5",
+            "bk_6",
+            "bk_9",
+            "bk_11",
+            "bk_12",
+            "bk_13",
+            "bk_14",
+            "bk_15",
+            "tr_0",
+            "tr_1",
+            "tr_3",
+            "tr_4",
+            "tr_7",
+            "tr_8",
+            "bk_h1",
+            "bk_h2",
+            "bk_h3",
+            "bk_h4",
+            "bk_h5",
+            "bk_h6",
+            "bk_h7",
+            "bk_h8",
+            "bk_h9",
+            "bk_h10",
+            "bk_h11",
+            "bk_h12"
+          ],
+          "tasks_file": "tasks/sample_tasks_63.json",
+          "temperature": 0.0,
+          "token_count_method": "tiktoken:o200k_base",
+          "workers": 4
+        },
+        "input_hashes": {
+          "config.json": "4b2f81a59ff31c4613f6cce7d102766b811a6de6866eb8f85b8203ea13cfdc25",
+          "runs.jsonl": "f01fccb59e0ae31f7a5e6a0591a137b25ffeb005e714b341a2f0e2840caaaf18",
+          "calls.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "dataset_status": "unverified: matches commit, but executed tree was dirty",
+        "missing": [],
+        "orphan_calls": []
+      },
+      {
+        "path": "/Users/yiboyang/Desktop/algoverse-mas-compression/results/run2/run2_primary/arms/allowlist",
+        "config": {
+          "attack_enabled": false,
+          "backend": "openai",
+          "cer_strata": [
+            [
+              "unexposed",
+              [
+                0.0,
+                1.0
+              ]
+            ],
+            [
+              "weak",
+              [
+                1.0,
+                1.5
+              ]
+            ],
+            [
+              "moderate",
+              [
+                1.5,
+                3.0
+              ]
+            ],
+            [
+              "strong",
+              [
+                3.0,
+                "inf"
+              ]
+            ]
+          ],
+          "compressor_budget_tokens": 150,
+          "compressor_model": "gpt-4o-mini",
+          "condition": "allowlist",
+          "controls_enabled": true,
+          "dataset_sha256": "eb78f48f100b05c3277bb748a5a8e78e81981bfe00532063e570ee4d99090eed",
+          "design": "shared-handoff-primary",
+          "experiment_id": "run2-primary",
+          "experiment_mode": "stress_test",
+          "git_branch": "compression-redesign",
+          "git_commit": "80725de345d0be47b3a671814c343a6198e7d65f",
+          "git_dirty": true,
+          "handoff_regime": "plan",
+          "manifest_sha256": "aa4030a831da2c5120f7a32b4a95c9b70bfbf38d5f32b368113a23edd999e36a",
+          "model": "gpt-4o-mini",
+          "output_dir": "/Users/yiboyang/Desktop/algoverse-mas-compression/results/run2/run2_primary/arms",
+          "primary_cer_min": 1.5,
+          "prompt_hashes": {
+            "agent1": "0dd82941f7cb",
+            "agent2_template": "a5c75b9200b6"
+          },
+          "repeats": 3,
+          "require_measured_tokens": true,
+          "run_id": "run2-primary-allowlist",
+          "seed": null,
+          "seed_policy": "unset_native_default_not_bit_reproducible",
+          "shared_agent1_trace_dir": "../../shared_agent1",
+          "shared_handoffs_file": "../../handoffs.jsonl",
+          "started_at": "2026-11-03T14:21:40Z",
+          "suites": [
+            "workspace",
+            "slack",
+            "banking",
+            "travel"
+          ],
+          "synthetic_expansion": true,
+          "task_ids": [
+            "ws_6",
+            "ws_7",
+            "ws_8",
+            "ws_9",
+            "ws_12",
+            "ws_21",
+            "ws_29",
+            "ws_31",
+            "ws_15",
+            "ws_18",
+            "ws_34",
+            "ws_20",
+            "ws_33",
+            "ws_25",
+            "ws_13",
+            "ws_4",
+            "ws_19",
+            "ws_36",
+            "sl_1",
+            "sl_2",
+            "sl_3",
+            "sl_4",
+            "sl_6",
+            "sl_8",
+            "sl_11",
+            "sl_13",
+            "sl_14",
+            "sl_15",
+            "sl_16",
+            "sl_17",
+            "sl_18",
+            "sl_19",
+            "sl_20",
+            "bk_0",
+            "bk_2",
+            "bk_3",
+            "bk_4",
+            "bk_5",
+            "bk_6",
+            "bk_9",
+            "bk_11",
+            "bk_12",
+            "bk_13",
+            "bk_14",
+            "bk_15",
+            "tr_0",
+            "tr_1",
+            "tr_3",
+            "tr_4",
+            "tr_7",
+            "tr_8",
+            "bk_h1",
+            "bk_h2",
+            "bk_h3",
+            "bk_h4",
+            "bk_h5",
+            "bk_h6",
+            "bk_h7",
+            "bk_h8",
+            "bk_h9",
+            "bk_h10",
+            "bk_h11",
+            "bk_h12"
+          ],
+          "tasks_file": "tasks/sample_tasks_63.json",
+          "temperature": 0.0,
+          "token_count_method": "tiktoken:o200k_base",
+          "workers": 4
+        },
+        "input_hashes": {
+          "config.json": "2a64c3208f9278e179962dd05f328f84272099fe2be65ebd8603a25e3f3bdac6",
+          "runs.jsonl": "b22d23f7e1dcf589bae0d304b241376ada58cdbf47318a72ce8fc8e876a97251",
+          "calls.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "dataset_status": "unverified: matches commit, but executed tree was dirty",
+        "missing": [],
+        "orphan_calls": []
+      }
+    ]
+  },
+  "limitations": [
+    "Scores are saved team primary scores, never rescored by this analysis.",
+    "All selected tasks remain in coverage; API/pipeline failures and missing rows are not model failures.",
+    "Failure taxonomy describes exclusive observable failure profiles, not proven semantic causes. Existing retention and schema checks are passed through unchanged.",
+    "PLAN schema warnings and configuration coverage warnings never remove primary rows.",
+    "calls.parse_status is not a parser outcome; use runs.parse_events and raw evidence.",
+    "Token counts are local text lengths, not billed usage; nominal budget is not a hard token limit.",
+    "Legacy config does not identify mock execution. Shared manifests record backend identity; mock outputs are non-empirical.",
+    "Shared handoffs control upstream sampling, but do not prove information loss or instruction misunderstanding. Review native controls and verbatim traces.",
+    "All 15 pairwise contrasts are exploratory; the five none-reference contrasts are marked primary. No multiplicity-adjusted significance claim is made.",
+    "Task-cluster intervals are exploratory; repeated calls are not independent tasks, and small samples can yield degenerate intervals."
+  ]
+}
