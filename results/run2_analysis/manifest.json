@@ -36,13 +36,13 @@
     "instruction_strip",
     "allowlist"
   ],
-  "created_at": "2026-11-03T14:21:40Z",
+  "created_at": "2026-11-03T14:28:31Z",
   "design": "shared-handoff-primary",
   "experiment_id": "run2-primary",
   "experimental_design": "One immutable Agent 1 draw per task/repeat reused across all six arms; none completed first.",
   "full_primary": true,
   "handoffs_file": "handoffs.jsonl",
-  "manifest_sha256": "aa4030a831da2c5120f7a32b4a95c9b70bfbf38d5f32b368113a23edd999e36a",
+  "manifest_sha256": "267f62cc377d5a978a5c2e499bcd46f9ccbc075ddfdf50d3a7c3e58c3e32505c",
   "planned": {
     "arm_trials": 1134,
     "handoffs": 189,
@@ -220,7 +220,7 @@
       "tracing.py": "617239124af662205fffea69e07186e7868948e7f5304408361de955f4e07f05"
     },
     "git_branch": "compression-redesign",
-    "git_commit": "80725de345d0be47b3a671814c343a6198e7d65f",
+    "git_commit": "83c11cc3cdadec5264e84eb0ca715ce8bff6df49",
     "git_dirty": true
   }
 }

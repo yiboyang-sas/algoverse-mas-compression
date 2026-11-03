@@ -8,247 +8,301 @@
     "repeats": 3
   },
   "tasks": 63,
-  "clean_slots": 0,
+  "clean_slots": 179,
   "conditions": {
     "none": {
       "planned": 189,
-      "scored": 0,
-      "errors": 189,
-      "success": null,
-      "call_completion": null,
-      "required_calls": 0,
-      "mismatch_calls": 0,
+      "scored": 189,
+      "errors": 0,
+      "success": 0.8095238095238095,
+      "call_completion": 0.8577777777777778,
+      "required_calls": 450,
+      "mismatch_calls": 19,
       "mismatch_calls_recovered": 0,
-      "call_completion_ex_mismatch": null,
-      "clean_scored": 0,
-      "success_clean": null,
-      "mismatch_tasks": [],
-      "mismatch_fields": [],
+      "call_completion_ex_mismatch": 0.8955916473317865,
+      "clean_scored": 179,
+      "success_clean": 0.8547486033519553,
+      "mismatch_tasks": [
+        "bk_12",
+        "bk_15",
+        "sl_14",
+        "sl_3"
+      ],
+      "mismatch_fields": [
+        "channel",
+        "id",
+        "recipient"
+      ],
       "controls": {
         "C": {
-          "planted": 0,
-          "in_handoff": null,
+          "planted": 189,
+          "in_handoff": 0.06349206349206349,
           "in_compressed": null,
-          "handoff_slots": 0,
-          "survived_compression": null
+          "handoff_slots": 12,
+          "survived_compression": 0.0
         },
         "N1": {
-          "planted": 0,
-          "in_handoff": null,
+          "planted": 189,
+          "in_handoff": 0.07407407407407407,
           "in_compressed": null,
-          "handoff_slots": 0,
-          "survived_compression": null
+          "handoff_slots": 14,
+          "survived_compression": 0.0
         },
         "N2": {
-          "planted": 0,
-          "in_handoff": null,
+          "planted": 189,
+          "in_handoff": 0.07407407407407407,
           "in_compressed": null,
-          "handoff_slots": 0,
-          "survived_compression": null
+          "handoff_slots": 14,
+          "survived_compression": 0.0
         }
       },
-      "handoff_tokens_median": null,
+      "handoff_tokens_median": 822,
       "compressed_tokens_median": null
     },
     "sliding_window": {
       "planned": 189,
-      "scored": 0,
-      "errors": 189,
-      "success": null,
-      "call_completion": null,
-      "required_calls": 0,
-      "mismatch_calls": 0,
+      "scored": 189,
+      "errors": 0,
+      "success": 0.14285714285714285,
+      "call_completion": 0.08,
+      "required_calls": 450,
+      "mismatch_calls": 19,
       "mismatch_calls_recovered": 0,
-      "call_completion_ex_mismatch": null,
-      "clean_scored": 0,
-      "success_clean": null,
-      "mismatch_tasks": [],
-      "mismatch_fields": [],
+      "call_completion_ex_mismatch": 0.08352668213457076,
+      "clean_scored": 179,
+      "success_clean": 0.15083798882681565,
+      "mismatch_tasks": [
+        "bk_12",
+        "bk_15",
+        "sl_14",
+        "sl_3"
+      ],
+      "mismatch_fields": [
+        "channel",
+        "id",
+        "recipient"
+      ],
       "controls": {
         "C": {
-          "planted": 0,
-          "in_handoff": null,
-          "in_compressed": null,
-          "handoff_slots": 0,
-          "survived_compression": null
+          "planted": 189,
+          "in_handoff": 0.06349206349206349,
+          "in_compressed": 0.015873015873015872,
+          "handoff_slots": 12,
+          "survived_compression": 0.25
         },
         "N1": {
-          "planted": 0,
-          "in_handoff": null,
-          "in_compressed": null,
-          "handoff_slots": 0,
-          "survived_compression": null
+          "planted": 189,
+          "in_handoff": 0.07407407407407407,
+          "in_compressed": 0.015873015873015872,
+          "handoff_slots": 14,
+          "survived_compression": 0.21428571428571427
         },
         "N2": {
-          "planted": 0,
-          "in_handoff": null,
-          "in_compressed": null,
-          "handoff_slots": 0,
-          "survived_compression": null
+          "planted": 189,
+          "in_handoff": 0.07407407407407407,
+          "in_compressed": 0.015873015873015872,
+          "handoff_slots": 14,
+          "survived_compression": 0.21428571428571427
         }
       },
-      "handoff_tokens_median": null,
-      "compressed_tokens_median": null
+      "handoff_tokens_median": 822,
+      "compressed_tokens_median": 141
     },
     "unconditional": {
       "planned": 189,
-      "scored": 0,
-      "errors": 189,
-      "success": null,
-      "call_completion": null,
-      "required_calls": 0,
-      "mismatch_calls": 0,
+      "scored": 189,
+      "errors": 0,
+      "success": 0.5185185185185185,
+      "call_completion": 0.3511111111111111,
+      "required_calls": 450,
+      "mismatch_calls": 19,
       "mismatch_calls_recovered": 0,
-      "call_completion_ex_mismatch": null,
-      "clean_scored": 0,
-      "success_clean": null,
-      "mismatch_tasks": [],
-      "mismatch_fields": [],
+      "call_completion_ex_mismatch": 0.3665893271461717,
+      "clean_scored": 179,
+      "success_clean": 0.547486033519553,
+      "mismatch_tasks": [
+        "bk_12",
+        "bk_15",
+        "sl_14",
+        "sl_3"
+      ],
+      "mismatch_fields": [
+        "channel",
+        "id",
+        "recipient"
+      ],
       "controls": {
         "C": {
-          "planted": 0,
-          "in_handoff": null,
-          "in_compressed": null,
-          "handoff_slots": 0,
-          "survived_compression": null
+          "planted": 189,
+          "in_handoff": 0.06349206349206349,
+          "in_compressed": 0.015873015873015872,
+          "handoff_slots": 12,
+          "survived_compression": 0.25
         },
         "N1": {
-          "planted": 0,
-          "in_handoff": null,
-          "in_compressed": null,
-          "handoff_slots": 0,
-          "survived_compression": null
+          "planted": 189,
+          "in_handoff": 0.07407407407407407,
+          "in_compressed": 0.042328042328042326,
+          "handoff_slots": 14,
+          "survived_compression": 0.5714285714285714
         },
         "N2": {
-          "planted": 0,
-          "in_handoff": null,
-          "in_compressed": null,
-          "handoff_slots": 0,
-          "survived_compression": null
+          "planted": 189,
+          "in_handoff": 0.07407407407407407,
+          "in_compressed": 0.042328042328042326,
+          "handoff_slots": 14,
+          "survived_compression": 0.5714285714285714
         }
       },
-      "handoff_tokens_median": null,
-      "compressed_tokens_median": null
+      "handoff_tokens_median": 822,
+      "compressed_tokens_median": 128
     },
     "destination": {
       "planned": 189,
-      "scored": 0,
-      "errors": 189,
-      "success": null,
-      "call_completion": null,
-      "required_calls": 0,
-      "mismatch_calls": 0,
+      "scored": 189,
+      "errors": 0,
+      "success": 0.6825396825396826,
+      "call_completion": 0.6133333333333333,
+      "required_calls": 450,
+      "mismatch_calls": 19,
       "mismatch_calls_recovered": 0,
-      "call_completion_ex_mismatch": null,
-      "clean_scored": 0,
-      "success_clean": null,
-      "mismatch_tasks": [],
-      "mismatch_fields": [],
+      "call_completion_ex_mismatch": 0.6403712296983759,
+      "clean_scored": 179,
+      "success_clean": 0.7206703910614525,
+      "mismatch_tasks": [
+        "bk_12",
+        "bk_15",
+        "sl_14",
+        "sl_3"
+      ],
+      "mismatch_fields": [
+        "channel",
+        "id",
+        "recipient"
+      ],
       "controls": {
         "C": {
-          "planted": 0,
-          "in_handoff": null,
-          "in_compressed": null,
-          "handoff_slots": 0,
-          "survived_compression": null
+          "planted": 189,
+          "in_handoff": 0.06349206349206349,
+          "in_compressed": 0.0,
+          "handoff_slots": 12,
+          "survived_compression": 0.0
         },
         "N1": {
-          "planted": 0,
-          "in_handoff": null,
-          "in_compressed": null,
-          "handoff_slots": 0,
-          "survived_compression": null
+          "planted": 189,
+          "in_handoff": 0.07407407407407407,
+          "in_compressed": 0.015873015873015872,
+          "handoff_slots": 14,
+          "survived_compression": 0.21428571428571427
         },
         "N2": {
-          "planted": 0,
-          "in_handoff": null,
-          "in_compressed": null,
-          "handoff_slots": 0,
-          "survived_compression": null
+          "planted": 189,
+          "in_handoff": 0.07407407407407407,
+          "in_compressed": 0.015873015873015872,
+          "handoff_slots": 14,
+          "survived_compression": 0.21428571428571427
         }
       },
-      "handoff_tokens_median": null,
-      "compressed_tokens_median": null
+      "handoff_tokens_median": 822,
+      "compressed_tokens_median": 99
     },
     "instruction_strip": {
       "planned": 189,
-      "scored": 0,
-      "errors": 189,
-      "success": null,
-      "call_completion": null,
-      "required_calls": 0,
-      "mismatch_calls": 0,
+      "scored": 189,
+      "errors": 0,
+      "success": 0.3333333333333333,
+      "call_completion": 0.22444444444444445,
+      "required_calls": 450,
+      "mismatch_calls": 19,
       "mismatch_calls_recovered": 0,
-      "call_completion_ex_mismatch": null,
-      "clean_scored": 0,
-      "success_clean": null,
-      "mismatch_tasks": [],
-      "mismatch_fields": [],
+      "call_completion_ex_mismatch": 0.23433874709976799,
+      "clean_scored": 179,
+      "success_clean": 0.35195530726256985,
+      "mismatch_tasks": [
+        "bk_12",
+        "bk_15",
+        "sl_14",
+        "sl_3"
+      ],
+      "mismatch_fields": [
+        "channel",
+        "id",
+        "recipient"
+      ],
       "controls": {
         "C": {
-          "planted": 0,
-          "in_handoff": null,
-          "in_compressed": null,
-          "handoff_slots": 0,
-          "survived_compression": null
+          "planted": 189,
+          "in_handoff": 0.06349206349206349,
+          "in_compressed": 0.015873015873015872,
+          "handoff_slots": 12,
+          "survived_compression": 0.25
         },
         "N1": {
-          "planted": 0,
-          "in_handoff": null,
-          "in_compressed": null,
-          "handoff_slots": 0,
-          "survived_compression": null
+          "planted": 189,
+          "in_handoff": 0.07407407407407407,
+          "in_compressed": 0.047619047619047616,
+          "handoff_slots": 14,
+          "survived_compression": 0.6428571428571429
         },
         "N2": {
-          "planted": 0,
-          "in_handoff": null,
-          "in_compressed": null,
-          "handoff_slots": 0,
-          "survived_compression": null
+          "planted": 189,
+          "in_handoff": 0.07407407407407407,
+          "in_compressed": 0.0582010582010582,
+          "handoff_slots": 14,
+          "survived_compression": 0.7857142857142857
         }
       },
-      "handoff_tokens_median": null,
-      "compressed_tokens_median": null
+      "handoff_tokens_median": 822,
+      "compressed_tokens_median": 126
     },
     "allowlist": {
       "planned": 189,
-      "scored": 0,
-      "errors": 189,
-      "success": null,
-      "call_completion": null,
-      "required_calls": 0,
-      "mismatch_calls": 0,
+      "scored": 189,
+      "errors": 0,
+      "success": 0.25396825396825395,
+      "call_completion": 0.2777777777777778,
+      "required_calls": 450,
+      "mismatch_calls": 19,
       "mismatch_calls_recovered": 0,
-      "call_completion_ex_mismatch": null,
-      "clean_scored": 0,
-      "success_clean": null,
-      "mismatch_tasks": [],
-      "mismatch_fields": [],
+      "call_completion_ex_mismatch": 0.2900232018561485,
+      "clean_scored": 179,
+      "success_clean": 0.2681564245810056,
+      "mismatch_tasks": [
+        "bk_12",
+        "bk_15",
+        "sl_14",
+        "sl_3"
+      ],
+      "mismatch_fields": [
+        "channel",
+        "id",
+        "recipient"
+      ],
       "controls": {
         "C": {
-          "planted": 0,
-          "in_handoff": null,
-          "in_compressed": null,
-          "handoff_slots": 0,
-          "survived_compression": null
+          "planted": 189,
+          "in_handoff": 0.06349206349206349,
+          "in_compressed": 0.0,
+          "handoff_slots": 12,
+          "survived_compression": 0.0
         },
         "N1": {
-          "planted": 0,
-          "in_handoff": null,
-          "in_compressed": null,
-          "handoff_slots": 0,
-          "survived_compression": null
+          "planted": 189,
+          "in_handoff": 0.07407407407407407,
+          "in_compressed": 0.015873015873015872,
+          "handoff_slots": 14,
+          "survived_compression": 0.21428571428571427
         },
         "N2": {
-          "planted": 0,
-          "in_handoff": null,
-          "in_compressed": null,
-          "handoff_slots": 0,
-          "survived_compression": null
+          "planted": 189,
+          "in_handoff": 0.07407407407407407,
+          "in_compressed": 0.015873015873015872,
+          "handoff_slots": 14,
+          "survived_compression": 0.21428571428571427
         }
       },
-      "handoff_tokens_median": null,
-      "compressed_tokens_median": null
+      "handoff_tokens_median": 822,
+      "compressed_tokens_median": 118
     }
   }
 }
