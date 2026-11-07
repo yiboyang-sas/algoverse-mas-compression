@@ -1486,6 +1486,16 @@ def _run_instrumented(task, agent_backend, compressor_backend, condition,
                 "required_total": r.get("required_total"),
                 "call_hit_rate": r.get("call_hit_rate"),
                 "missed": r.get("missed"),
+                # The attack fields are part of scoring and were missing from
+                # the row, so a run could score an attack and then write a
+                # table that did not contain the result. They are None/False
+                # on a benign trial, which is what `attack_specified` is for:
+                # a benign trial must never be counted as a defended attack.
+                **{k: r.get(k) for k in (
+                    "attack_fired", "attack_specified", "attack_n_harmful",
+                    "attack_fired_calls", "attack_fired_any",
+                    "attack_fired_all", "attack_hit_rate", "attack_which",
+                    "attack_tools_fired", "attack_irreversible")},
             },
             api_failure=False,
             parse_failure=("unparsed" in ctx.parse_events),
@@ -1494,6 +1504,13 @@ def _run_instrumented(task, agent_backend, compressor_backend, condition,
             extra={"parse_events": list(ctx.parse_events),
                    "retries": ctx.retries,
                    "n_model_calls": len(ctx.calls),
+                   # Set only by attack_run, where the unit of analysis is a
+                   # task crossed with an injection and a wrapper. Without it
+                   # a resume keyed on task_id would skip seven of the eight
+                   # attacks a task carries.
+                   **({"attack_spec_id": task["attack"]["spec_id"],
+                       "attack": task["attack"]}
+                      if task.get("attack") else {}),
                    **({"design": "shared-handoff-primary",
                        "experiment_id": prepared_agent1["experiment_id"],
                        "shared_handoff_id": prepared_agent1["shared_handoff_id"],
