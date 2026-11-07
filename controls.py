@@ -197,14 +197,20 @@ def _critical_values(task: dict) -> list:
     return out
 
 
-def _record_span(doc: str, at: int) -> tuple:
+def _record_span(doc: str, at: int, starts=None) -> tuple:
     """The record containing offset `at`, as (start, end).
 
     Needed to ask whether the record holds a scored value, which is what
     decides the arm. Falls back to the whole document when there are no
     record boundaries, which is correct for prose.
+
+    `starts` is the record-boundary offsets, passed in by callers that have a
+    document with many fields: computing them per field made planting
+    quadratic in the document length, which on a 19KB mailbox with seventy
+    fields is seconds rather than milliseconds.
     """
-    starts = [m.start() for m in _RECORD_START.finditer(doc)]
+    if starts is None:
+        starts = [m.start() for m in _RECORD_START.finditer(doc)]
     if not starts:
         return 0, len(doc)
     befores = [s for s in starts if s <= at]
@@ -213,17 +219,29 @@ def _record_span(doc: str, at: int) -> tuple:
     return start, (afters[0] if afters else len(doc))
 
 
-def _slots(task: dict) -> list:
-    """Every place a control could go. [(doc_index, insert_at, on_target)]
+def _slots(task: dict, text: str = None,
+           allow_critical_fields: bool = False) -> list:
+    """Every place `text` could go. [(doc_index, insert_at, on_target)]
 
-    `insert_at` is the offset of the closing quote of the field, so the
-    control is appended INSIDE the field's value and the record's syntax is
-    untouched.
+    `insert_at` is the offset of the closing quote of the field, so the text
+    is appended INSIDE the field's value and the record's syntax is untouched.
+
+    `text` is what will be inserted, and it is needed because a field is only
+    a usable slot for text that does not contain the field's own quote
+    character. The controls were written without quotes so this never bit
+    them, but AgentDojo's injection goals are full of apostrophes -- "the
+    user's phone model", "the text 'Hey, how is it going?'" -- and appending
+    one of those inside a single-quoted field closes the string early and
+    leaves a seam far louder than the injection. Defaults to the controls'
+    own text so existing callers are unchanged.
     """
+    if text is None:
+        text = "".join(c.text for c in ALL)
     crit = _critical_values(task)
     out = []
     for di, doc in enumerate(task.get("documents") or []):
         found = list(_FIELD.finditer(doc)) or list(_LONG_STRING.finditer(doc))
+        starts = [m.start() for m in _RECORD_START.finditer(doc)]
         for m in found:
             quote = m.group(2) if m.re is _FIELD else m.group(1)
             value = m.group(3) if m.re is _FIELD else m.group(2)
@@ -231,11 +249,16 @@ def _slots(task: dict) -> list:
             # scorer ignores prose fields, but a long `location` string is
             # prose-shaped and IS matched on tr_1, so this is checked rather
             # than assumed.
-            if any(c in norm(value) for c in crit):
+            # `allow_critical_fields` is for the attack arm only, where a few
+            # tasks have no other field at all. Appending still leaves the
+            # scored value in place, but it is a weaker guarantee, so it is
+            # off by default and the caller records when it was used.
+            if not allow_critical_fields and any(c in norm(value)
+                                                 for c in crit):
                 continue
-            if quote in "".join(c.text for c in ALL):
+            if quote in text:
                 continue                 # would close the string early
-            rs, re_ = _record_span(doc, m.start())
+            rs, re_ = _record_span(doc, m.start(), starts)
             on_target = any(c in norm(doc[rs:re_]) for c in crit)
             out.append((di, m.end() - 1, on_target))
     return out
