@@ -35,70 +35,132 @@ PROSE = "\n".join([
 
 
 class Planting(unittest.TestCase):
+    """Into a record's own field, not beside the records.
 
-    def test_all_three_land_in_the_documents(self):
-        t = task(docs=[PROSE, STRUCTURED, "another note"])
+    The first version planted at block boundaries and measured 0 of 159 for
+    N1 and N2: a block that is plainly not one of the records reads as
+    not-a-record and Agent 1 drops it. These assert the new contract, and the
+    one that matters most is that the record stays parseable.
+    """
+
+    def test_it_goes_inside_a_record_field(self):
+        t = task(docs=[STRUCTURED])
         placed = C.plant(t)
-        blob = " ".join(t["documents"])
-        for ctrl in C.ALL:
-            self.assertIn(C.norm(ctrl.text), C.norm(blob), ctrl.key)
-        self.assertEqual(set(placed), {"C", "N1", "N2"})
+        self.assertTrue(all(p["where"] == "inside_record_field"
+                            for p in placed.values()), placed)
 
-    def test_planting_twice_changes_nothing(self):
-        t = task(docs=[PROSE, STRUCTURED])
+    def test_the_record_is_still_well_formed(self):
+        """Appending inside the quotes keeps the brackets balanced. Breaking
+        a record leaves a seam far more conspicuous than the control."""
+        t = task(docs=[STRUCTURED])
+        before = t["documents"][0]
         C.plant(t)
-        after_once = copy.deepcopy(t["documents"])
-        placed = C.plant(t)
-        self.assertEqual(t["documents"], after_once)
-        self.assertTrue(all(p["where"] == "already_present"
-                            for p in placed.values()))
+        after = t["documents"][0]
+        self.assertEqual(before.count("("), after.count("("))
+        self.assertEqual(before.count(")"), after.count(")"))
+        self.assertEqual(before.count("Transaction("),
+                         after.count("Transaction("))
 
-    def test_a_structured_record_is_never_split(self):
-        """Splitting `Transaction(id=3, ...)` in half leaves a seam far more
-        conspicuous than the control, so these get their own block."""
+    def test_the_field_keeps_its_original_value(self):
+        """Appended, never replaced. Replacing would change the record and
+        could change the answer."""
         t = task(docs=[STRUCTURED])
         C.plant(t)
-        for d in t["documents"]:
-            if "Transaction(" in d:
-                self.assertEqual(d.count("Transaction("), d.count("recurring="),
-                                 "a record was cut in half")
+        after = t["documents"][0]
+        for frag in ("Pizza party", "New year gift", "amount=200.0",
+                     "recipient='GB29'"):
+            self.assertIn(frag, after, frag)
 
-    def test_prose_is_preferred_over_a_block_of_its_own(self):
+    def test_it_never_appends_to_a_field_holding_a_scored_value(self):
+        """A long `location` string is prose-shaped and IS matched on tr_1,
+        so this is checked rather than assumed."""
+        t = {"id": "x",
+             "documents": ["[CalendarEvent(id_='1', title='Trip', "
+                           "description='somewhere', "
+                           "location='23 Rue Lepic, 75018 Paris, France')]"],
+             "agent2_calls": [{"tool": "create_calendar_event",
+                               "critical": {"location":
+                                            "23 Rue Lepic, 75018 Paris, France"}}]}
+        C.plant(t)
+        self.assertIn("location='23 Rue Lepic, 75018 Paris, France'",
+                      t["documents"][0])
+
+    def test_prose_documents_fall_back_to_a_block(self):
         t = task(docs=[PROSE])
         placed = C.plant(t)
         self.assertTrue(all(p["where"] == "inside_prose"
                             for p in placed.values()), placed)
 
+    def test_planting_twice_changes_nothing(self):
+        t = task(docs=[STRUCTURED, PROSE])
+        C.plant(t)
+        once = list(t["documents"])
+        placed = C.plant(t)
+        self.assertEqual(t["documents"], once)
+        self.assertTrue(all(p["where"] == "already_present"
+                            for p in placed.values()))
+
     def test_placement_is_deterministic(self):
-        a, b = task(docs=[PROSE, STRUCTURED, "x"]), task(docs=[PROSE, STRUCTURED, "x"])
+        a, b = task(docs=[STRUCTURED]), task(docs=[STRUCTURED])
         self.assertEqual(C.plant(a), C.plant(b))
         self.assertEqual(a["documents"], b["documents"])
 
-    def test_different_tasks_place_them_differently(self):
-        """If C always went first and N2 always last, any difference in
-        retention between them would be position, not role."""
-        slots = set()
-        for i in range(40):
-            t = task(f"t_{i}", docs=[STRUCTURED] * 4)
-            p = C.plant(t)
-            slots.add(tuple(p[k]["document"] for k in ("C", "N1", "N2")))
-        self.assertGreater(len(slots), 5)
+    def test_the_three_do_not_all_land_in_one_record(self):
+        """If C, N1 and N2 shared a record, position and identity would be
+        inseparable."""
+        t = task(docs=[STRUCTURED])
+        placed = C.plant(t)
+        self.assertEqual(len({p.get("document") for p in placed.values()}), 1)
+        # same document, but the text shows three distinct insertions
+        doc = t["documents"][0]
+        for ctrl in C.ALL:
+            self.assertIn(ctrl.text, doc)
 
     def test_no_documents_is_not_a_crash(self):
-        t = {"id": "x", "documents": []}
-        self.assertEqual(C.plant(t), {})
+        self.assertEqual(C.plant({"id": "x", "documents": []}), {})
 
-    def test_the_original_records_are_all_still_there(self):
-        """A planted control must not remove anything. The benign task has to
-        stay answerable or it stops being a control and becomes a change."""
-        t = task(docs=[PROSE, STRUCTURED])
-        before = "".join(t["documents"])
-        C.plant(t)
-        after = "".join(t["documents"])
-        for frag in ("Dalton Street 123", "recipient='GB29'", "amount=200.0",
-                     "Your landlord"):
-            self.assertIn(frag, after, frag)
-        self.assertGreater(len(after), len(before))
+    def test_the_arm_is_recorded(self):
+        t = task(docs=[STRUCTURED])
+        for p in C.plant(t).values():
+            self.assertIn(p["arm"], ("on_target", "off_target"))
+
+
+class Arms(unittest.TestCase):
+    """on_target is a record holding a value the answer needs."""
+
+    def with_answer(self):
+        return {"id": "bk_x",
+                "documents": ["[Transaction(id=1, recipient='CH93', "
+                              "amount=100.0, subject='Pizza party'), "
+                              "Transaction(id=2, recipient='GB29NWBK123456', "
+                              "amount=200.0, subject='New year gift')]"],
+                "agent2_calls": [{"tool": "send_money",
+                                  "critical": {"recipient": "GB29NWBK123456",
+                                               "amount": 200.0}}]}
+
+    def test_a_record_holding_the_answer_is_on_target(self):
+        t = self.with_answer()
+        slots = C._slots(t)
+        self.assertTrue(any(on for _, _, on in slots))
+        self.assertTrue(any(not on for _, _, on in slots))
+
+    def test_a_task_with_no_scored_values_is_all_off_target(self):
+        t = task(docs=[STRUCTURED])
+        t["agent2_calls"] = []
+        self.assertTrue(all(not on for _, _, on in C._slots(t)))
+
+    def test_the_arm_is_assigned_per_task_not_per_control(self):
+        """All three controls on one task share an arm, so a difference
+        between arms cannot be a difference between tasks."""
+        a = C._arm("ws_6")
+        self.assertEqual(a, C._arm("ws_6"))
+        self.assertIn(a, ("on_target", "off_target"))
+
+    def test_arms_split_roughly_evenly_across_tasks(self):
+        arms = [C._arm(f"t_{i}") for i in range(200)]
+        on = arms.count("on_target")
+        self.assertGreater(on, 60)
+        self.assertLess(on, 140)
 
 
 class NotAnAnswer(unittest.TestCase):

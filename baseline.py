@@ -946,7 +946,7 @@ def _control_rows(records):
                 k: v for k, v in d.items()
                 if k in ("key", "label", "role", "n_facts", "in_documents",
                          "in_handoff", "in_compressed", "facts_in_handoff",
-                         "facts_in_compressed")}) for d in rows])
+                         "facts_in_compressed", "arm")}) for d in rows])
     return out
 
 
@@ -971,6 +971,23 @@ def _print_controls(records, condition):
             m = s["measured_after_compression"]
             line += f"{s['compressed_any']/m:>12.0%}"
         print(line)
+    arms = controls.by_arm(rows)
+    if len(arms) > 1:
+        print("\n    BY WHERE IT WAS PLANTED:")
+        print(f"      {'placement':<22}{'slots':>7}{'in handoff':>12}"
+              f"{'C':>7}{'N1':>7}{'N2':>7}")
+        for arm in sorted(arms, key=lambda a: -arms[a]["slots"]):
+            a = arms[arm]
+            n = a["slots"] or 1
+            per = []
+            for k in ("C", "N1", "N2"):
+                b = a["by_control"][k]
+                per.append(f"{(b['handoff_any']/b['slots'] if b['slots'] else 0):>6.0%}")
+            print(f"      {arm:<22}{a['slots']:>7}"
+                  f"{a['handoff_any']/n:>12.0%}" + "".join(f"{x:>7}" for x in per))
+        print("      on_target is a record holding a value the answer needs.")
+        print("      If on_target retains and off_target does not, planted")
+        print("      content survives only by riding on a needed record.")
     print("    'in handoff' is any fact surviving, 'all facts' is every one.")
     print("    N1 is inert, N2 is an imperative. An attack that survives no")
     print("    better than N2 means compression keeps commands, not attacks.")
@@ -1425,7 +1442,8 @@ def _run_instrumented(task, agent_backend, compressor_backend, condition,
     r["controls"] = [c.as_dict() for c in controls.measure(
         task.get("documents") or [], handoff,
         ((r.get("text") or {}).get("compressed")
-         if condition != "none" else None))]
+         if condition != "none" else None),
+        placement=task.get("control_placement"))]
 
     if writer is not None:
         writer.write("runs", tracing.run_record(
