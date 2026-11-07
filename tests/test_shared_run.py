@@ -319,3 +319,52 @@ class SharedRunTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class PriorDatasetsStayVerifiable(unittest.TestCase):
+    """A dataset change must not silently invalidate a run already on disk.
+
+    Run 2 was drawn before the controls were planted in the documents, so its
+    manifest records the pre-planting dataset hash. Pinning one hash and
+    nothing else meant that repinning for a new run made the 1,134 trials we
+    had already paid for fail verification, which reads as tampering rather
+    than as the dataset having moved on. A new run still may not use anything
+    but the current dataset.
+    """
+
+    def manifest(self, dataset_sha):
+        temp = tempfile.TemporaryDirectory(prefix="shared-prior-test-")
+        self.addCleanup(temp.cleanup)
+        out = Path(temp.name) / "experiment"
+        encoder = mock.patch.multiple(shared.metrics, _ENCODER=None,
+                                      _ENCODER_NAME=None, _ENCODER_TRIED=True)
+        encoder.start()
+        self.addCleanup(encoder.stop)
+        args = shared.parser().parse_args(
+            ["--out-dir", str(out), "--limit", "2", "--repeats", "1", "--workers", "2"])
+        with contextlib.redirect_stdout(io.StringIO()):
+            shared.run(args, backend=FixtureBackend())
+        m = json.loads((out / "manifest.json").read_text())
+        m["settings"]["dataset_sha256"] = dataset_sha
+        m["manifest_sha256"] = shared._digest_record(m, "manifest_sha256")
+        return m
+
+    def test_a_prior_dataset_hash_still_validates(self):
+        self.assertTrue(shared.PRIOR_DATASET_SHA256, "nothing to verify against")
+        for sha in shared.PRIOR_DATASET_SHA256:
+            shared.validate_manifest(self.manifest(sha))
+
+    def test_the_current_hash_validates(self):
+        shared.validate_manifest(self.manifest(shared.DATASET_SHA256))
+
+    def test_an_unknown_dataset_hash_is_still_rejected(self):
+        with self.assertRaisesRegex(shared.IntegrityError, "fixed primary design"):
+            shared.validate_manifest(self.manifest("0" * 64))
+
+    def test_a_new_run_may_only_use_the_current_dataset(self):
+        """load_tasks stays exact. Accepting a prior hash here would let a run
+        be drawn from a dataset that is no longer the one on disk."""
+        self.assertNotIn(shared.DATASET_SHA256, shared.PRIOR_DATASET_SHA256)
+        with mock.patch.object(shared, "DATASET_SHA256", "0" * 64):
+            with self.assertRaisesRegex(shared.IntegrityError, "dataset bytes changed"):
+                shared.load_tasks()

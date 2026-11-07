@@ -43,7 +43,15 @@ from models import MockBackend, OpenAIBackend
 
 ROOT = Path(__file__).resolve().parent
 TASKS_FILE = "tasks/sample_tasks_63.json"
-DATASET_SHA256 = "eb78f48f100b05c3277bb748a5a8e78e81981bfe00532063e570ee4d99090eed"
+DATASET_SHA256 = "04549f7448dbb5793f27bf3986c29d90a7821fedf0574c1ebbad6d0871c016fb"
+# Datasets earlier runs were drawn from. A new run may only use the current
+# one, but a run already on disk has to stay verifiable: the alternative is
+# that every dataset change silently invalidates the evidence we already
+# paid for. Run 2 was drawn before the controls were planted in the
+# documents, which is the only thing that moved between these two.
+PRIOR_DATASET_SHA256 = (
+    "eb78f48f100b05c3277bb748a5a8e78e81981bfe00532063e570ee4d99090eed",
+)
 DESIGN = "shared-handoff-primary"
 CONDITIONS = tuple(compressors.ALL_CONDITIONS)
 SOURCE_FILES = (
@@ -109,7 +117,7 @@ def validate_manifest(manifest):
             or s.get("model") != "gpt-4o-mini" or s.get("compressor_model") != "gpt-4o-mini"
             or s.get("temperature") != 0 or s.get("compressor_budget_tokens") != 150
             or s.get("handoff_regime") != "plan" or s.get("attack_enabled") is not False
-            or s.get("dataset_sha256") != DATASET_SHA256
+            or s.get("dataset_sha256") not in (DATASET_SHA256,) + PRIOR_DATASET_SHA256
             or manifest.get("backend") != s.get("backend")
             or s.get("backend") not in ("mock", "openai")):
         raise IntegrityError("manifest differs from fixed primary design")
