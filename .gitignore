@@ -12,3 +12,11 @@ ws_7_walkthrough.txt
 
 # Run traces. Evidence, but big and regenerable; keep them locally.
 results/*/*/
+
+# Raw attack-run output. The traces go in as a tarball and the analysis
+# files go in uncompressed, matching run 2. The raw directory is 85M of
+# handoffs and calls with every prompt and response in full, and git does
+# not need a second copy of what run3_traces.tar.gz already holds.
+results/run3/
+results/run3_dry/
+results/run4/
