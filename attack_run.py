@@ -52,6 +52,7 @@ import fcntl
 import json
 import os
 from pathlib import Path
+import threading
 import time
 import uuid
 
@@ -287,6 +288,24 @@ def _done(out, manifest):
     return done
 
 
+def _last_fired(arm_dir):
+    """Whether the row just written had its attack fire.
+
+    Read off the tail of the file rather than threaded back out of
+    run_pipeline, because run_pipeline is baseline's instrumented version and
+    the attack arm should not be the reason that signature grows.
+    """
+    try:
+        with open(Path(arm_dir) / "runs.jsonl", "rb") as handle:
+            handle.seek(0, 2)
+            size = handle.tell()
+            handle.seek(max(0, size - 65536))
+            tail = handle.read().splitlines()
+        return bool(json.loads(tail[-1]).get("attack_fired_any"))
+    except Exception:
+        return False
+
+
 def _error_row(task, repeat, cfg, shared, error_type, stage):
     return tracing.run_record(
         cfg=cfg, task=task, repeat=repeat, metrics={},
@@ -406,15 +425,49 @@ def _run_locked(args, *, backend=None):
                                                 "downstream"))
         _fsync(arm_dir / "runs.jsonl")
         done[condition].add(key)
+        tick(condition, _last_fired(arm_dir))
 
     planned = [(spec, repeat) for repeat in range(args.repeats)
                for spec in specs]
+
+    # PROGRESS, because the first version printed only when a condition
+    # finished and a resumed 522-trial run therefore sat silent for half an
+    # hour. There is no way to tell that from a hang, and the reasonable
+    # response to a hang is Ctrl-C, which is how this run got interrupted at
+    # 726 of 1,248 in the first place.
+    progress = {"done": 0, "fired": 0, "last": 0.0}
+    progress_lock = threading.Lock()
+
+    def tick(condition, fired):
+        with progress_lock:
+            progress["done"] += 1
+            progress["fired"] += bool(fired)
+            now = time.time()
+            n, total = progress["done"], len(planned)
+            if now - progress["last"] < 15 and n != total:
+                return
+            progress["last"] = now
+            elapsed = now - progress["started"]
+            line = (f"    {condition}  {n}/{total} trials"
+                    f"   {progress['fired']} attacks fired")
+            # No rate until there is enough elapsed time to mean one. The
+            # first tick otherwise reports several thousand trials a minute,
+            # which is worse than saying nothing.
+            if elapsed > 20:
+                rate = n / elapsed * 60
+                line += f"   {rate:.0f}/min   ~{(total - n) / rate:.0f} min left"
+            print(line, flush=True)
+
+    progress["started"] = time.time()
     try:
         for condition in args.conditions:
+            print(f"  {condition}: {len(planned) - len(done[condition])} "
+                  f"trials to run ({len(done[condition])} already on disk)",
+                  flush=True)
             with futures.ThreadPoolExecutor(max_workers=args.workers) as pool:
                 list(pool.map(lambda item: arm(*item, condition), planned))
-            print(f"{condition}: {len(done[condition])}/{len(planned)} trials",
-                  flush=True)
+            print(f"  {condition}: {len(done[condition])}/{len(planned)} "
+                  f"trials complete", flush=True)
     finally:
         upstream.close()
         cache_writer.close()
