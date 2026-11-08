@@ -258,6 +258,40 @@ class Resume(Base):
         with self.assertRaisesRegex(attack_run.IntegrityError, "specs file"):
             self.execute(Obedient(), "--specs", str(other))
 
+    def test_finishing_a_paid_run_with_the_mock_backend_is_refused(self):
+        """The footgun, and it is not hypothetical. A long paid run gets
+        interrupted at 726 of 1,248, the command is retyped without
+        --execute-paid, and the remaining 522 trials are filled in by the
+        mock backend while the manifest still says openai. The table then
+        reads as a full model run with 42% of it fabricated, and nothing in
+        the output would say so.
+
+        Simulated by rewriting the manifest to the paid backend rather than
+        by spending money: the resume path compares what the experiment
+        started as against what is being asked for now, which is the same
+        comparison either way round.
+        """
+        self.execute(Obedient())
+        path = self.out / "manifest.json"
+        m = json.loads(path.read_text())
+        m["backend"] = m["settings"]["backend"] = "openai"
+        m["manifest_sha256"] = attack_run._digest_record(m, "manifest_sha256")
+        path.write_text(json.dumps(m))
+        with self.assertRaisesRegex(attack_run.IntegrityError, "backend"):
+            self.execute(Obedient())
+
+    def test_changed_repeats_on_a_resume_are_refused(self):
+        self.execute(Obedient())
+        with self.assertRaisesRegex(attack_run.IntegrityError, "repeats"):
+            self.execute(Obedient(), "--repeats", "2")
+
+    def test_a_narrower_limit_on_a_resume_is_refused(self):
+        """A --limit on a resume would quietly leave the rest of the specs
+        permanently unrun while status.json said complete."""
+        self.execute(Obedient())
+        with self.assertRaisesRegex(attack_run.IntegrityError, "specs"):
+            self.execute(Obedient(), "--limit", "3")
+
     def test_changed_conditions_refuse_to_resume(self):
         """Run 4's conditions belong in run 4's directory. Writing them into
         run 3's would leave one manifest describing two designs."""

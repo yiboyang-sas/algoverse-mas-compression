@@ -233,6 +233,26 @@ def _open_or_create(args, specs, specs_sha, method):
             raise IntegrityError(
                 "this experiment's conditions differ from the ones requested; "
                 "run the new conditions into their own --out-dir")
+        # THE SETTINGS THAT MAKE THE ROWS COMPARABLE ARE FROZEN ON RESUME.
+        # The backend above all. Dropping --execute-paid on a resume would
+        # finish a half-done paid run with the mock backend, and because the
+        # manifest already says openai the table would read as 1,248 model
+        # trials while half of it was a fake. Interrupting a long run and
+        # retyping the command without the flag is exactly how that happens.
+        wanted = _settings(args, specs, specs_sha, method)
+        for field in ("backend", "repeats", "compressor_budget_tokens",
+                      "model", "compressor_model", "temperature",
+                      "handoff_regime"):
+            if stored.get(field) != wanted.get(field):
+                raise IntegrityError(
+                    f"{field} was {stored.get(field)!r} when this experiment "
+                    f"started and is {wanted.get(field)!r} now; resuming "
+                    f"would mix two settings in one table")
+        if len(stored.get("spec_ids") or []) != len(wanted["spec_ids"]):
+            raise IntegrityError(
+                f"this experiment covers {len(stored.get('spec_ids') or [])} "
+                f"specs and {len(wanted['spec_ids'])} were requested; a "
+                f"--limit on a resume would leave the rest permanently unrun")
         return out, manifest
     out.mkdir(parents=True, exist_ok=True)
     eid = uuid.uuid4().hex
