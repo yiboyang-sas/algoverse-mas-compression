@@ -306,6 +306,62 @@ def _last_fired(arm_dir):
         return False
 
 
+def _rewrite_jsonl(path, keep, failed_path, dropped):
+    """Replace `path` with `keep`, appending `dropped` to `failed_path`.
+
+    The failed rows are moved, not deleted: they are evidence of what the
+    network did during the run, and the trace logs still hold their calls.
+    The rewrite goes through a sibling temp file and an atomic rename so an
+    interruption leaves either the old journal or the new one, never half.
+    """
+    if not dropped:
+        return
+    with open(failed_path, "a") as handle:
+        for row in dropped:
+            handle.write(json.dumps(row, sort_keys=True) + "\n")
+        handle.flush()
+        os.fsync(handle.fileno())
+    tmp = path.with_name(path.name + ".tmp")
+    with open(tmp, "w") as handle:
+        for row in keep:
+            handle.write(json.dumps(row, sort_keys=True) + "\n")
+        handle.flush()
+        os.fsync(handle.fileno())
+    os.replace(tmp, path)
+
+
+def set_aside_failures(out, manifest) -> dict:
+    """Make API failures runnable again on resume.
+
+    A trial that failed because the network dropped is written as a row with
+    api_failure set, and the resume logic counts it as done, so without this
+    it stays a failure forever. Same for an Agent 1 draw that errored: it is
+    cached in handoffs.jsonl with status "error" and never redrawn.
+
+    Only infrastructure failures move. A trial where the model ran and did
+    the wrong thing is a result and is never touched. An Agent 1 draw that
+    succeeded is kept, so an arm retried after an Agent 2 failure still uses
+    the same draw as the other arm and the pairing holds.
+    """
+    out = Path(out)
+    moved = {}
+    path = out / "handoffs.jsonl"
+    rows = _read_jsonl(path)
+    bad = [r for r in rows if r.get("status") == "error"]
+    _rewrite_jsonl(path, [r for r in rows if r.get("status") != "error"],
+                   out / "handoffs.failed.jsonl", bad)
+    moved["agent1_draws"] = len(bad)
+    for condition, arm in manifest["arms"].items():
+        path = out / "arms" / arm["run_dir"] / "runs.jsonl"
+        rows = _read_jsonl(path)
+        bad = [r for r in rows if r.get("api_failure")]
+        _rewrite_jsonl(path, [r for r in rows if not r.get("api_failure")],
+                       path.with_name("runs.failed.jsonl"), bad)
+        moved[condition] = len(bad)
+    print(f"  set aside for retry: {moved}", flush=True)
+    return moved
+
+
 def _error_row(task, repeat, cfg, shared, error_type, stage):
     return tracing.run_record(
         cfg=cfg, task=task, repeat=repeat, metrics={},
@@ -340,10 +396,13 @@ def _run_locked(args, *, backend=None):
         raise IntegrityError("paid backend forbidden without --execute-paid")
 
     out, manifest = _open_or_create(args, specs, specs_sha, method)
+    if getattr(args, "retry_failed", False):
+        set_aside_failures(out, manifest)
     configs = {c: _config(manifest, c, out) for c in args.conditions}
     done = _done(out, manifest)
     backend = backend or (
-        baseline._Retrying(OpenAIBackend("gpt-4o-mini", temperature=0.0))
+        baseline._Retrying(OpenAIBackend("gpt-4o-mini", temperature=0.0),
+                           tries=getattr(args, "retries", 4))
         if args.execute_paid else MockBackend(follows_injection=False))
     instrument.traced(backend)
 
@@ -580,6 +639,13 @@ def parser():
     ap.add_argument("--execute-paid", action="store_true")
     ap.add_argument("--report-only", action="store_true",
                     help="re-read an existing out-dir and print it")
+    ap.add_argument("--retry-failed", action="store_true",
+                    help="on resume, move API-failure rows and errored Agent 1 "
+                         "draws aside so they run again; model results are "
+                         "never touched")
+    ap.add_argument("--retries", type=int, default=4,
+                    help="attempts per model call before a trial is recorded "
+                         "as an API failure (backoff doubles from 1s)")
     return ap
 
 

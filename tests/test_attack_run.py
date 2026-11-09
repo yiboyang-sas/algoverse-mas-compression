@@ -421,3 +421,68 @@ class HeadWindow(Base):
         self.assertNotIn("compressor", stages)
         self.assertEqual(stages.count("agent1"), 6)
         self.assertEqual(stages.count("agent2"), 12)
+
+
+class RetryFailed(Base):
+    """A trial lost to the network is not a result, and must be runnable
+    again. A trial where the model ran is a result, and must never move."""
+
+    class Flaky(Obedient):
+        """Fails every call for the first N trials' Agent 1, and every Agent 2
+        call on one spec, then behaves."""
+
+        def __init__(self, fail_agent1=(), fail_agent2=()):
+            super().__init__()
+            self.fail_agent1 = set(fail_agent1)
+            self.fail_agent2 = set(fail_agent2)
+
+        def chat(self, system, user):
+            import instrument
+            ctx = instrument.current()
+            stage = ctx.stage_override or instrument.stage_from_system(system)
+            if stage == "agent1" and ctx.task_id in self.fail_agent1:
+                raise ConnectionError("network down")
+            if stage == "agent2" and ctx.task_id in self.fail_agent2:
+                raise ConnectionError("network down")
+            return super().chat(system, user)
+
+    def ids(self):
+        return [attack_run.spec_id(s)
+                for s in attack_run.load_specs()[0][:6]]
+
+    def test_failures_are_redrawn_and_results_are_kept(self):
+        ids = self.ids()
+        conds = ("--conditions", "none", "sliding_window_head")
+        first = self.execute(self.Flaky(fail_agent1=ids[:2],
+                                        fail_agent2=ids[2:3]), *conds)
+        self.assertEqual(first["conditions"]["none"]["api_failures"], 3)
+        good_before = {(r["attack_spec_id"], r["repeat"]): r["timestamp"]
+                       for r in attack_run.rows(self.out, self.manifest(),
+                                                "none")
+                       if not r["api_failure"]}
+        handoff_before = {
+            r["attack_spec_id"]: r["shared_handoff_id"]
+            for r in attack_run._read_jsonl(self.out / "handoffs.jsonl")
+            if r["status"] == "ready"}
+
+        # A plain resume leaves the failures in place.
+        again = self.execute(Obedient(), *conds)
+        self.assertEqual(again["conditions"]["none"]["api_failures"], 3)
+
+        fixed = self.execute(Obedient(), *conds, "--retry-failed")
+        for c in ("none", "sliding_window_head"):
+            self.assertEqual(fixed["conditions"][c]["api_failures"], 0)
+            self.assertEqual(fixed["conditions"][c]["trials"], 6)
+        rows = attack_run.rows(self.out, self.manifest(), "none")
+        kept = {(r["attack_spec_id"], r["repeat"]): r["timestamp"]
+                for r in rows if (r["attack_spec_id"], r["repeat"])
+                in good_before}
+        self.assertEqual(kept, good_before, "model results never move")
+        after = {r["attack_spec_id"]: r["shared_handoff_id"]
+                 for r in attack_run._read_jsonl(self.out / "handoffs.jsonl")}
+        for key, hid in handoff_before.items():
+            self.assertEqual(after[key], hid,
+                             "a good Agent 1 draw is reused, keeping pairs")
+        failed = attack_run._read_jsonl(
+            self.out / "arms" / "none" / "runs.failed.jsonl")
+        self.assertEqual(len(failed), 3, "failures are kept as evidence")

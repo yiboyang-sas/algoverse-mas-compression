@@ -15,7 +15,9 @@
 #   bash run4b.sh
 #
 # Paid, gpt-4o-mini. Safe to re-run: attack_run.py resumes after integrity
-# checks and never redraws an Agent 1 handoff it already has.
+# checks and never redraws an Agent 1 handoff it already has. Trials lost to
+# the network (API failures) are set aside and run again on every re-run, so
+# if the summary shows api failures, just run this again.
 set -euo pipefail
 cd "$(dirname "$0")"
 
@@ -32,7 +34,7 @@ if [ -n "$(git status --porcelain --untracked-files=no)" ]; then
 fi
 git fetch -q origin compression-redesign
 git checkout -q compression-redesign
-git pull -q --ff-only origin compression-redesign
+git pull -q --rebase origin compression-redesign
 
 echo "== 2/6 tokenizer (a paid run refuses estimated token counts)"
 python3 -m pip install --user --quiet --upgrade tiktoken
@@ -48,6 +50,7 @@ AN=results/run4b_analysis
 echo "== 4/6 paid run -> $OUT (582 trials)"
 python3 attack_run.py --out-dir "$OUT" --specs tasks/attack_specs_run4.json \
   --conditions none sliding_window_head --workers 4 --execute-paid \
+  --retry-failed --retries 8 \
   || echo "   run reported failures; exporting what completed"
 
 echo "== 5/6 export -> $AN"
@@ -60,6 +63,7 @@ ls -lh results/run4b_traces.tar.gz
 echo "== 6/6 push results"
 git add "$AN" results/run4b_traces.tar.gz
 git commit -q -m "Run 4b results: sliding_window_head beside none, run 4 specs, 97x3" || true
+git pull -q --rebase origin compression-redesign || true
 if git push -q origin compression-redesign; then
   echo "Pushed. Tell Claude 'run 4b is done' and it will read the results."
 else
