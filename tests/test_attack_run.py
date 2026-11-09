@@ -359,3 +359,65 @@ class Report(Base):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class HeadWindow(Base):
+    """sliding_window_head: the 600-char window kept from the front.
+
+    Added because the tail window drops Agent 1's PLAN on every handoff longer
+    than the window, so its column measured an Agent 2 that was never told
+    what to do. Both ends are kept so the paper can show the gap.
+    """
+
+    def test_head_keeps_the_plan_and_tail_drops_it(self):
+        import compressors
+        handoff = "PLAN: call send_money with amount = 7.5\n\nEVIDENCE: " + "x" * 2000
+        head = compressors.compress("sliding_window_head", handoff, None, {})
+        tail = compressors.compress("sliding_window", handoff, None, {})
+        self.assertTrue(head.startswith("PLAN: call send_money"))
+        self.assertNotIn("PLAN", tail)
+        self.assertEqual(len(head), len(tail), "same window, other end")
+
+    def test_a_short_handoff_is_untouched_by_either_end(self):
+        import compressors
+        short = "PLAN: call send_money\n\nEVIDENCE: one record"
+        for c in ("sliding_window", "sliding_window_head"):
+            self.assertEqual(compressors.compress(c, short, None, {}), short)
+
+    def test_run_2s_six_conditions_are_unchanged(self):
+        """shared_run pins its manifest to exactly these six, in this order.
+        A seventh in ALL_CONDITIONS would fail run 2's own integrity check."""
+        import compressors
+        self.assertEqual(compressors.ALL_CONDITIONS, [
+            "none", "sliding_window", "unconditional",
+            "destination", "instruction_strip", "allowlist"])
+        self.assertIn("sliding_window_head", compressors.KNOWN_CONDITIONS)
+
+    def test_the_attack_runner_accepts_it_beside_none(self):
+        status = self.execute(Obedient(), "--conditions", "none",
+                              "sliding_window_head")
+        self.assertEqual(set(status["conditions"]),
+                         {"none", "sliding_window_head"})
+        self.assertEqual(
+            status["conditions"]["sliding_window_head"]["trials"], 6)
+
+    def test_it_is_mechanical_and_shares_agent_1_with_none(self):
+        """No compressor model call, and one Agent 1 draw per spec serves
+        both arms, which is what keeps the pairing with none clean."""
+        backend = Obedient()
+        calls = []
+        original = backend.chat
+
+        def counting(system, user):
+            import instrument
+            ctx = instrument.current()
+            stage = ctx.stage_override or instrument.stage_from_system(system)
+            calls.append((ctx.task_id, ctx.repeat, stage))
+            return original(system, user)
+
+        backend.chat = counting
+        self.execute(backend, "--conditions", "none", "sliding_window_head")
+        stages = [c[2] for c in calls]
+        self.assertNotIn("compressor", stages)
+        self.assertEqual(stages.count("agent1"), 6)
+        self.assertEqual(stages.count("agent2"), 12)

@@ -192,7 +192,7 @@ def validate_manifest(manifest):
         raise IntegrityError("invalid repeat count")
     if not s.get("spec_ids") or len(s["spec_ids"]) != len(set(s["spec_ids"])):
         raise IntegrityError("invalid or duplicated spec identifiers")
-    unknown = set(s.get("conditions") or []) - set(compressors.ALL_CONDITIONS)
+    unknown = set(s.get("conditions") or []) - set(compressors.KNOWN_CONDITIONS)
     if not s.get("conditions") or unknown:
         raise IntegrityError(f"unknown conditions {sorted(unknown)}")
     return manifest

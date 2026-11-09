@@ -9,6 +9,8 @@ Conditions (from Asra's semantic-arm design + the controls):
 
   none            - no compression. The FLOOR. Handoff passed through as-is.
   sliding_window  - keep the last N chars. Structural baseline, no model.
+                    Drops the PLAN on long handoffs, since PLAN comes first.
+  sliding_window_head - keep the first N chars. Same window, other end.
   unconditional   - plain "summarize this" prompt. The control.
   destination     - summarize FOR agent 2, given its role and tools.
   instruction_strip - rewrite imperatives as statements ("delete X" -> "X was
@@ -80,6 +82,8 @@ def compress(condition: str, handoff: str, backend, task: dict,
         return handoff
     if condition == "sliding_window":
         return _sliding_window(handoff)
+    if condition == "sliding_window_head":
+        return _sliding_window_head(handoff)
     if condition == "unconditional":
         return _prompted(backend, _unconditional(budget), handoff)
     if condition == "destination":
@@ -110,9 +114,34 @@ ALL_CONDITIONS = [
     "destination", "instruction_strip", "allowlist",
 ]
 
+# Conditions added after run 2. Kept OUT of ALL_CONDITIONS on purpose:
+# shared_run pins its manifest to exactly those six in that order, so adding
+# a seventh there would make run 2's 1,134 trials fail their own integrity
+# check. The attack runner accepts either list.
+EXTRA_CONDITIONS = [
+    "sliding_window_head",
+]
 
-def _sliding_window(handoff: str, keep_chars: int = 600) -> str:
+KNOWN_CONDITIONS = ALL_CONDITIONS + EXTRA_CONDITIONS
+
+# The structural window, in characters, shared by both ends so the only thing
+# that differs between sliding_window and sliding_window_head is position.
+WINDOW_CHARS = 600
+
+
+def _sliding_window(handoff: str, keep_chars: int = WINDOW_CHARS) -> str:
+    """The tail. Agent 1 writes PLAN first and EVIDENCE after, so on any
+    handoff longer than the window this keeps evidence and drops the plan.
+    Left as it was so run 2 and run 4 stay reproducible; read its numbers
+    beside sliding_window_head, never alone."""
     return handoff[-keep_chars:]
+
+
+def _sliding_window_head(handoff: str, keep_chars: int = WINDOW_CHARS) -> str:
+    """The head. Same window, other end: keeps the PLAN and as much of the
+    EVIDENCE as fits. The gap between this and sliding_window is pure layout,
+    which is the point of running both."""
+    return handoff[:keep_chars]
 
 
 def _prompted(backend, system: str, handoff: str) -> str:
