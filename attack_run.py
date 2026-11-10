@@ -502,7 +502,7 @@ def _run_locked(args, *, backend=None):
             progress["done"] += 1
             progress["fired"] += bool(fired)
             now = time.time()
-            n, total = progress["done"], len(planned)
+            n, total = progress["done"], progress["total"]
             if now - progress["last"] < 15 and n != total:
                 return
             progress["last"] = now
@@ -520,7 +520,13 @@ def _run_locked(args, *, backend=None):
     progress["started"] = time.time()
     try:
         for condition in args.conditions:
-            print(f"  {condition}: {len(planned) - len(done[condition])} "
+            todo = len(planned) - len(done[condition])
+            # Per condition, so the second arm counts from 0 to its own
+            # total instead of carrying the first arm's count past 100%.
+            with progress_lock:
+                progress.update(done=0, fired=0, last=0.0, total=todo,
+                                started=time.time())
+            print(f"  {condition}: {todo} "
                   f"trials to run ({len(done[condition])} already on disk)",
                   flush=True)
             with futures.ThreadPoolExecutor(max_workers=args.workers) as pool:
