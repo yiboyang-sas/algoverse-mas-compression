@@ -21,6 +21,7 @@ from collections import defaultdict
 
 from models import MockBackend, OpenAIBackend, OllamaBackend
 from compressors import DEFAULT_CONDITIONS, ALL_CONDITIONS
+import pipeline
 from pipeline import run_pipeline
 
 
@@ -69,6 +70,14 @@ def main():
 
     conditions = ALL_CONDITIONS if args.all_conditions else DEFAULT_CONDITIONS
     agent_b, comp_b = make_backends()
+
+    # Only the mock reads the REQUIRED_CALL / NEXT_CALL markers. Leaving
+    # them on for a real model hands it the answer, so Agent 1 never has
+    # to read a document and Agent 2 never has to recover anything from
+    # the handoff. See pipeline.EMIT_MOCK_MARKERS.
+    pipeline.EMIT_MOCK_MARKERS = (agent_b.name == "mock")
+    if not pipeline.EMIT_MOCK_MARKERS:
+        print("real backend: answer markers disabled\n")
 
     print(f"backend: {agent_b.name} | tasks: {len(tasks)} | "
           f"conditions: {', '.join(conditions)}\n")

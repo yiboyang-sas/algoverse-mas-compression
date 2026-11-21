@@ -16,6 +16,7 @@ Switch backend in ONE place: see config at the bottom of run.py.
 
 from __future__ import annotations
 import json
+import time
 import os
 import re
 import urllib.request
@@ -130,6 +131,66 @@ def _mk_call(tool: str, args_str: str) -> dict:
 # and any local server (vLLM, LM Studio, Ollama's /v1 shim) that speaks the
 # /chat/completions format.
 # --------------------------------------------------------------------------
+class FatalBackendError(RuntimeError):
+    """A failure no amount of retrying fixes: a rejected key, an exhausted
+    balance. Separate from the transient errors so the outer wrapper in
+    baseline.py can let it through instead of retrying a billing message
+    four times per call across eight workers."""
+
+
+def _request_with_retry(req, tries: int = 4, timeout: int = 120) -> dict:
+    """Send a request, retrying transient failures.
+
+    Without this, one slow response raises straight out of run_pipeline and
+    the whole sweep dies, losing every task that already completed. An 18-task
+    run is several minutes of API calls; a single timeout should not cost all
+    of it. Seen twice in practice on 18-task runs.
+    """
+    last = None
+    for i in range(tries):
+        try:
+            with urllib.request.urlopen(req, timeout=timeout) as resp:
+                return json.loads(resp.read())
+        except urllib.error.HTTPError as e:
+            # Say WHICH error. "HTTPError" alone cannot distinguish a rate
+            # limit, which wants fewer workers and a longer wait, from a bad
+            # key, which no amount of retrying fixes, from a request too
+            # large for the model, which needs a shorter handoff. Eight bare
+            # HTTPErrors at once told us nothing.
+            try:
+                detail = e.read(400).decode("utf-8", "replace")
+            except Exception:
+                detail = ""
+            last = e
+            if e.code in (401, 403):
+                raise FatalBackendError(
+                    f"OpenAI rejected the key ({e.code}). Retrying will not "
+                    f"help. {detail[:200]}") from e
+            # A 429 is normally a rate limit and worth waiting out. But
+            # OpenAI also returns 429 for an exhausted balance, and that
+            # never recovers: retrying it four times per call, across eight
+            # workers, turns one clear billing error into a wall of noise
+            # and burns minutes before anyone sees the message.
+            if "credit" in detail.lower() or "quota" in detail.lower():
+                raise FatalBackendError(
+                    "OpenAI says the account or project is out of credit, so "
+                    "retrying will not help. The org balance and a project's "
+                    "own budget are separate: a sk-proj- key can be refused "
+                    "while the organisation still shows a balance. Check the "
+                    "project's limits, not just Billing.\n    " + detail[:200]
+                ) from e
+            wait = float(e.headers.get("retry-after") or 0) or (2 ** i)
+            if i < tries - 1:
+                print(f"    [HTTP {e.code} {detail[:90]!r}; waiting {wait:.0f}s]",
+                      flush=True)
+                time.sleep(min(wait, 30))
+        except Exception as e:          # timeouts, resets
+            last = e
+            if i < tries - 1:
+                time.sleep(2 ** i)
+    raise last
+
+
 class OpenAIBackend(Backend):
     name = "openai"
 
@@ -158,8 +219,7 @@ class OpenAIBackend(Backend):
                 "Authorization": f"Bearer {self.api_key}",
             },
         )
-        with urllib.request.urlopen(req, timeout=120) as resp:
-            data = json.loads(resp.read())
+        data = _request_with_retry(req)
         return data["choices"][0]["message"]["content"]
 
 

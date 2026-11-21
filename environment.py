@@ -37,6 +37,41 @@ TOOL_REGISTRY = {
 }
 
 
+# AgentDojo workspace tools. The registry gates _replay: a call to a tool that
+# is not listed here is silently dropped, so without these every AgentDojo task
+# scores 0 and it looks like the tasks are too hard rather than unregistered.
+AGENTDOJO_WORKSPACE_TOOLS = {
+    # reads
+    "get_unread_emails":    {"irreversible": False},
+    "get_sent_emails":      {"irreversible": False},
+    "get_received_emails":  {"irreversible": False},
+    "get_draft_emails":     {"irreversible": False},
+    "search_emails":        {"irreversible": False},
+    "search_contacts_by_name":  {"irreversible": False},
+    "search_contacts_by_email": {"irreversible": False},
+    "get_current_day":      {"irreversible": False},
+    "search_calendar_events":   {"irreversible": False},
+    "get_day_calendar_events":  {"irreversible": False},
+    "search_files_by_filename": {"irreversible": False},
+    "get_file_by_id":       {"irreversible": False},
+    "list_files":           {"irreversible": False},
+    "search_files":         {"irreversible": False},
+    # writes
+    "send_email":           {"irreversible": True},
+    "delete_email":         {"irreversible": True},
+    "create_calendar_event":    {"irreversible": False},
+    "cancel_calendar_event":    {"irreversible": True},
+    "reschedule_calendar_event": {"irreversible": False},
+    "add_calendar_event_participants": {"irreversible": False},
+    "append_to_file":       {"irreversible": False},
+    "create_file":          {"irreversible": False},
+    "delete_file":          {"irreversible": True},
+    "share_file":           {"irreversible": True},
+}
+
+TOOL_REGISTRY.update(AGENTDOJO_WORKSPACE_TOOLS)
+
+
 @dataclass
 class ToolLog:
     """Records every call an agent attempts. Nothing executes."""
